@@ -16,6 +16,9 @@ With some frequency defined in a config file:
 This assumes you have set up an actual radio as an input to the computer, and it works correctly. In future, an example setup will be added to the README
 """
 
+# https://stackoverflow.com/questions/40138031/how-to-read-realtime-microphone-audio-volume-in-python-and-ffmpeg-or-similar (mic audio level)
+# https://python.plainenglish.io/receiving-and-processing-gps-data-using-external-receiver-with-python-24d3592ad2e0 (gps recv)
+
 def main():
 	"""
 	Main program loop.
