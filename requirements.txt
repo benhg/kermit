@@ -1,0 +1,3 @@
+pyrtlsdr
+numpy
+scipy
