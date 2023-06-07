@@ -32,3 +32,8 @@ Today, RTLSDR and LINE IN are supported
 Defaults to RTLSDR
 """
 SIGNAL_SOURCE = SignalSource.RTLSDR
+
+"""
+The /dev path that the USB serial device shows up at
+"""
+GPS_DEV_PATH = ""
