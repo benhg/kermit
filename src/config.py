@@ -20,6 +20,22 @@ class SignalSource(Enum):
     LINE_IN = auto()
     # TODO more like USB line in etc
 
+"""
+The frequency to listen on, in Hz
+
+A sensible default is 137.00 (MHz), as that is an often-empty frequency in the aircraft band
+Set it to something that plays nice with your antenna
+"""
+LISTENING_FREQUENCY = 14523e4
+
+class RtlSdrSettings:
+    """
+    Class that stores RTL SDR settings for initialization
+    """
+    sample_rate = 2.048e6 # Sample rate in Hz
+    center_freq = LISTENING_FREQUENCY # Center frequency, in Hz
+    freq_correction = 60  # Parts per million
+
 
 """
 Because the antenna is not an isotropic radiator, and the input is all in relative db, not absolute db, we need to be able to convert to actual dbi.
@@ -37,3 +53,8 @@ SIGNAL_SOURCE = SignalSource.RTLSDR
 The /dev path that the USB serial device shows up at
 """
 GPS_DEV_PATH = ""
+
+"""
+Set the sampling interval, in seconds
+"""
+SAMPLE_INTERVAL = 0.5
