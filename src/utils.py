@@ -6,4 +6,6 @@
 """
 Map dB ranges to S-units, for clear annunciation
 """
-S_UNIT_SCALE = {}
+S_UNIT_SCALE_HF = {}
+
+S_UNIT_SCALE_VHF = {}

@@ -5,6 +5,7 @@
 """
 
 from enum import Enum, auto
+from utils import S_UNIT_SCALE_HF, S_UNIT_SCALE_VHF
 
 
 class SignalSource(Enum):
@@ -20,7 +21,6 @@ class SignalSource(Enum):
     LINE_IN = auto()
     # TODO more like USB line in etc
 
-
 """
 The frequency to listen on, in Hz
 
@@ -29,6 +29,12 @@ Set it to something that plays nice with your antenna
 """
 LISTENING_FREQUENCY = 14523e4
 
+"""
+Because s-unit scales are different for VHF vs HF, we need a config parameter to specify to the program whether the user is listening in VHF or HF
+
+We expect most users to use VHF, so we will default to that
+"""
+S_UNIT_SCALE = S_UNIT_SCALE_VHF
 
 class RtlSdrSettings:
     """
@@ -46,17 +52,23 @@ Because the antenna is not an isotropic radiator, and the input is all in relati
 We assume you are using a ham-stick or similar simple antenna, by default, which basically behaves like a 0 dBi antenna.
 """
 ANTENNA_FUDGE_FACTOR = 0
+
 """
 Set the program's signal source.
 Today, RTLSDR and LINE IN are supported
 Defaults to RTLSDR
 """
 SIGNAL_SOURCE = SignalSource.RTLSDR
+
 """
 The /dev path that the USB serial device shows up at
 """
 GPS_DEV_PATH = ""
+
 """
 Set the sampling interval, in seconds
 """
 SAMPLE_INTERVAL = 0.5
+
+
+
