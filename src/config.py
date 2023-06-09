@@ -27,7 +27,7 @@ The frequency to listen on, in Hz
 A sensible default is 137.00 (MHz), as that is an often-empty frequency in the aircraft band
 Set it to something that plays nice with your antenna
 """
-LISTENING_FREQUENCY = 14523e4
+LISTENING_FREQUENCY = 146520000
 
 """
 Because s-unit scales are different for VHF vs HF, we need a config parameter to specify to the program whether the user is listening in VHF or HF
@@ -43,7 +43,7 @@ class RtlSdrSettings:
     sample_rate = 2.048e6  # Sample rate in Hz
     center_freq = LISTENING_FREQUENCY  # Center frequency, in Hz
     freq_correction = 60  # Parts per million
-    gain = "auto"  # Be careful when overriding this.
+    gain = 0  # Be careful when overriding this.
 
 
 """
@@ -68,7 +68,7 @@ GPS_DEV_PATH = ""
 """
 Set the sampling interval, in seconds
 """
-SAMPLE_INTERVAL = 0.5
+SAMPLE_INTERVAL = 1.0
 
 
 
