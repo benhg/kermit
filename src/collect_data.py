@@ -38,6 +38,9 @@ def read_signal_str(sdr):
         # this is TOO EASY
         samples = sdr.read_samples(512)
 
+    # Once we have some samples of the signal, we can extract the power
+    # https://stackoverflow.com/questions/57828899/prefactors-computing-psd-of-a-signal-with-numpy-fft-vs-scipy-signal-welch
+
 
 def main():
     """
