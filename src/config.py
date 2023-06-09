@@ -70,5 +70,14 @@ Set the sampling interval, in seconds
 """
 SAMPLE_INTERVAL = 1.0
 
+"""
+A flag used to enable/disable the annunciation of signal strength
+"""
+ANNOUNCE_SIGNAL = True
 
+
+"""
+Every _n_ samples, announce the signal
+"""
+ANNOUNCE_SIGNAL_EVERY = 5
 
