@@ -42,8 +42,8 @@ class RtlSdrSettings:
     """
     sample_rate = 2.048e6  # Sample rate in Hz
     center_freq = LISTENING_FREQUENCY  # Center frequency, in Hz
-    freq_correction = 60  # Parts per million
-    gain = 0  # Be careful when overriding this.
+    freq_correction = 1  # Parts per million
+    gain = 24.0  # Be careful when overriding this.
 
 
 """

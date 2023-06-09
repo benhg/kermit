@@ -77,7 +77,7 @@ def read_signal_str(sdr):
     """
     if sdr:
         # this is TOO EASY
-        samples = sdr.read_samples(512)
+        samples = sdr.read_samples(1024)
     else:
         #collect_samples_from_line_in()
         pass
