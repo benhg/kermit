@@ -30,6 +30,8 @@ from rtlsdr import RtlSdr
 
 from config import SAMPLE_INTERVAL, SignalSource, SIGNAL_SOURCE, RtlSdrSettings, ANTENNA_FUDGE_FACTOR, LISTENING_FREQUENCY, ANNOUNCE_SIGNAL, ANNOUNCE_SIGNAL_EVERY
 
+from utils import get_platform_speak_func
+
 
 def dbfft(x, fs, win=None, ref=1):
     """
@@ -89,32 +91,6 @@ def read_signal_str(sdr):
     db_result = avg_db - ANTENNA_FUDGE_FACTOR
     print(db_result)
     return db_result
-
-def speak_darwin(text):
-    """
-    The function for using the `say` command on MacOS
-    """
-    os.system(f"say '{text}'")
-
-def speak_linux(text):
-    """
-    The function for using the `espeak` command on Linux
-    """
-    os.system(f'echo "{text}" | espeak')
-
-
-def get_platform_speak_func(platform):
-    """
-    Get a callable that uses the system's text-to-speech program to say a word.
-
-    Returns a function that has one parameter, the text to say
-    """
-    if platform == "Darwin":
-        return speak_darwin
-    elif platform == "Linux":
-        return speak_linux
-        
-            
 
 def announce_signal(signal_strength_db, freq, speak_func):
     """
