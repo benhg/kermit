@@ -55,7 +55,7 @@ S_UNIT_SCALE_HF = {
 }
 
 S_UNIT_SCALE_VHF = {
-"S0": Interval(start=-999, end=-48),
+    "S0": Interval(start=-999, end=-48),
     "S1": Interval(start=-48, end=-42),
     "S2": Interval(start=-42, end=-36),
     "S3": Interval(start=-36, end=-30),
