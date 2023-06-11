@@ -41,7 +41,8 @@ def get_s_unit_from_db(signal_strength_db):
     """
     for key, interval in S_UNIT_SCALE.items():
         if interval.in_interval(signal_strength_db):
-            logging.debug(f"Signal strength {signal_strength_db} corresponds to {key}")
+            logging.debug(
+                f"Signal strength {signal_strength_db} corresponds to {key}")
             return key
     return "Unknown S-unit"
 
@@ -92,7 +93,9 @@ def read_signal_str(sdr):
     """
     if sdr:
         # this is TOO EASY
-        logging.debug(f"Reading signal samples from RTLSDR at sample rate {RtlSdrSettings.sample_rate}")
+        logging.debug(
+            f"Reading signal samples from RTLSDR at sample rate {RtlSdrSettings.sample_rate}"
+        )
         samples = sdr.read_samples(1024)
     else:
         #collect_samples_from_line_in()
@@ -100,9 +103,13 @@ def read_signal_str(sdr):
 
     # Once we have some samples of the signal, we can extract the power
     freq, dbfs = dbfft(samples, RtlSdrSettings.sample_rate)
-    logging.debug(f"Signal sample summary: min - {np.min(dbfs)}, max: - {np.max(dbfs)}, average - {np.average(dbfs)}")
+    logging.debug(
+        f"Signal sample summary: min - {np.min(dbfs)}, max: - {np.max(dbfs)}, average - {np.average(dbfs)}"
+    )
     max_db = np.max(dbfs)
-    logging.debug(f"Shifting measured signal {max_db} by antenna gain {ANTENNA_FUDGE_FACTOR}")
+    logging.debug(
+        f"Shifting measured signal {max_db} by antenna gain {ANTENNA_FUDGE_FACTOR}"
+    )
     db_result = max_db - ANTENNA_FUDGE_FACTOR
     return db_result
 
@@ -116,9 +123,11 @@ def announce_signal(signal_strength_s_unit, speak_func):
     """
     speak_func(signal_strength_s_unit)
 
+
 def get_current_location():
     logging.warning(f"Location detection is not yet implemented")
-    return 0,0
+    return 0, 0
+
 
 def main():
     """
@@ -151,15 +160,20 @@ def main():
         signal_strength_s_unit = get_s_unit_from_db(signal_strength_db)
         lat, lng = get_current_location()
 
-        logging.info(f"Signal strength {signal_strength_db} dB ({signal_strength_db}). Location: ({lat}, {lng})")
+        logging.info(
+            f"Signal strength {signal_strength_db} dB ({signal_strength_db}). Location: ({lat}, {lng})"
+        )
         time.sleep(SAMPLE_INTERVAL)
 
         if ANNOUNCE_SIGNAL and (i % ANNOUNCE_SIGNAL_EVERY == 0):
-            logging.debug(f"Announcing signal strength {signal_strength_db} dB ({signal_strength_db})")
+            logging.debug(
+                f"Announcing signal strength {signal_strength_db} dB ({signal_strength_db})"
+            )
             announce_signal(signal_strength_s_unit, speak_func)
 
         i += 1
 
+
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
     main()
