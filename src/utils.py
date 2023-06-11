@@ -8,6 +8,7 @@ Map dB ranges to S-units, for clear annunciation
 """
 import subprocess
 
+
 class Interval():
     """
     This class represents a range between two numbers
@@ -24,44 +25,51 @@ class Interval():
         """
         Check if a number is in this interval
         """
-        return (val > start and val <= end)
+        return (val > self.start and val <= self.end)
+
 
 """
-The s-unit scales
+The S-unit scales
 
 To make the announcments shorter, we use an extended scale, so above S-9,
     instead of saying S-9 plus x, we instead define S_x as S_(x-1) + 6 dB
+
+We also add S-0 for below -48
 """
 
 S_UNIT_SCALE_HF = {
-    "S-1": Interval(start=-48, end=-42),
-    "S-2": Interval(start=-42, end=-36),
-    "S-3": Interval(start=-36, end=-30),
-    "S-4": Interval(start=-30, end=-24),
-    "S-5": Interval(start=-24, end=-18),
-    "S-6": Interval(start=-18, end=-12),
-    "S-7": Interval(start=-12, end=-6),
-    "S-8": Interval(start=-6, end=0),
-    "S-9": Interval(start=0, end=6),
-    "S-10": Interval(start=6, end=12),
-    "S-11": Interval(start=12, end=18),
-    "S-12": Interval(start=18, end=24),
-    "S-too much": Interval(start=24, end=999)
+    "S0": Interval(start=-999, end=-48),
+    "S1": Interval(start=-48, end=-42),
+    "S2": Interval(start=-42, end=-36),
+    "S3": Interval(start=-36, end=-30),
+    "S4": Interval(start=-30, end=-24),
+    "S5": Interval(start=-24, end=-18),
+    "S6": Interval(start=-18, end=-12),
+    "S7": Interval(start=-12, end=-6),
+    "S8": Interval(start=-6, end=0),
+    "S9": Interval(start=0, end=6),
+    "S10": Interval(start=6, end=12),
+    "S11": Interval(start=12, end=18),
+    "S12": Interval(start=18, end=24),
+    "S too much": Interval(start=24, end=999)
 }
 
-S_UNIT_SCALE_VHF = {    "S-1": Interval(start=-48, end=-42),
-    "S-2": Interval(start=-42, end=-36),
-    "S-3": Interval(start=-36, end=-30),
-    "S-4": Interval(start=-30, end=-24),
-    "S-5": Interval(start=-24, end=-18),
-    "S-6": Interval(start=-18, end=-12),
-    "S-7": Interval(start=-12, end=-6),
-    "S-8": Interval(start=-6, end=0),
-    "S-9": Interval(start=0, end=6),
-    "S-10": Interval(start=6, end=12),
-    "S-11": Interval(start=12, end=18),
-    "S-12": Interval(start=18, end=24),
-    "S-too much": Interval(start=24, end=999)}
+S_UNIT_SCALE_VHF = {
+"S0": Interval(start=-999, end=-48),
+    "S1": Interval(start=-48, end=-42),
+    "S2": Interval(start=-42, end=-36),
+    "S3": Interval(start=-36, end=-30),
+    "S4": Interval(start=-30, end=-24),
+    "S5": Interval(start=-24, end=-18),
+    "S6": Interval(start=-18, end=-12),
+    "S7": Interval(start=-12, end=-6),
+    "S8": Interval(start=-6, end=0),
+    "S9": Interval(start=0, end=6),
+    "S10": Interval(start=6, end=12),
+    "S11": Interval(start=12, end=18),
+    "S12": Interval(start=18, end=24),
+    "S too much": Interval(start=24, end=999)
+}
 
 
 def speak_darwin(text):

@@ -34,7 +34,7 @@ Because s-unit scales are different for VHF vs HF, we need a config parameter to
 
 We expect most users to use VHF, so we will default to that
 """
-S_UNIT_SCALE = S_UNIT_SCALE_VHF
+S_UNIT_SCALE = S_UNIT_SCALE_VHF if LISTENING_FREQUENCY >= 3e7 else S_UNIT_SCALE_HF
 
 
 class RtlSdrSettings:

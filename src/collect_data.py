@@ -28,9 +28,20 @@ import os
 
 from rtlsdr import RtlSdr
 
-from config import SAMPLE_INTERVAL, SignalSource, SIGNAL_SOURCE, RtlSdrSettings, ANTENNA_FUDGE_FACTOR, LISTENING_FREQUENCY, ANNOUNCE_SIGNAL, ANNOUNCE_SIGNAL_EVERY
-
+from config import SAMPLE_INTERVAL, SignalSource, SIGNAL_SOURCE, RtlSdrSettings, ANTENNA_FUDGE_FACTOR, LISTENING_FREQUENCY, ANNOUNCE_SIGNAL, ANNOUNCE_SIGNAL_EVERY, S_UNIT_SCALE
 from utils import get_platform_speak_func
+
+
+def get_s_unit_from_db(signal_strength_db):
+    """
+    Get the S-unit of a signal given it's strength in dB
+
+    @param signal_strength_db: The signal strength in dB
+    """
+    for key, interval in S_UNIT_SCALE.items():
+        if interval.in_interval(signal_strength_db):
+            return key
+    return "Unknown S-unit"
 
 
 def dbfft(x, fs, win=None, ref=1):
@@ -93,15 +104,14 @@ def read_signal_str(sdr):
     return db_result
 
 
-def announce_signal(signal_strength_db, freq, speak_func):
+def announce_signal(signal_strength_s_unit, speak_func):
     """
     Announce the signal strength using system text to speech
     
     @param signal_strength_db: Signal strength in dB
-    @param freq: Frequency listening on, to decide whether to use VHF or HF s-scale
     @param speak_func: speak function to use for announcin strength
     """
-    speak_func(f"S {int(signal_strength_db)}")
+    speak_func(signal_strength_s_unit)
 
 
 def main():
@@ -128,11 +138,11 @@ def main():
     i = 0
     while True:
         signal_strength_db = read_signal_str(sdr)
+        signal_strength_s_unit = get_s_unit_from_db(signal_strength_db)
         time.sleep(SAMPLE_INTERVAL)
 
         if ANNOUNCE_SIGNAL and (i % ANNOUNCE_SIGNAL_EVERY == 0):
-            announce_signal(signal_strength_db, LISTENING_FREQUENCY,
-                            speak_func)
+            announce_signal(signal_strength_s_unit, speak_func)
 
         i += 1
 
