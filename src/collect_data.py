@@ -86,7 +86,7 @@ def read_signal_str(sdr):
 
     # Once we have some samples of the signal, we can extract the power
     freq, dbfs = dbfft(samples, RtlSdrSettings.sample_rate)
-    avg_db = np.average(dbfs)
+    avg_db = np.max(dbfs)
 
     db_result = avg_db - ANTENNA_FUDGE_FACTOR
     print(db_result)

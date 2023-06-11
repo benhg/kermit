@@ -8,7 +8,27 @@ Map dB ranges to S-units, for clear annunciation
 """
 import subprocess
 
-S_UNIT_SCALE_HF = {}
+class Interval():
+	"""
+	This class represents a range between two numbers
+	We use it for our S-unit scales
+	"""
+	def __init__(self, start=0, end=0):
+		"""
+		Constructor for interval class
+		"""
+		self.start = start
+		self.end = end
+
+	def in_interval(self, val):
+		"""
+		Check if a number is in this interval
+		"""
+		return (val > start and val <= end)
+
+S_UNIT_SCALE_HF = {
+	"S-1": Interval(start=-48.2, end=0)
+}
 
 S_UNIT_SCALE_VHF = {}
 
