@@ -26,8 +26,18 @@ class Interval():
 		"""
 		return (val > start and val <= end)
 
+"""
+The s-unit scales
+
+To make the announcments shorter, we use an extended scale, so above S-9,
+    instead of saying S-9 plus x, we instead define S_x as S_(x-1) + 6 dB
+"""
+
 S_UNIT_SCALE_HF = {
-	"S-1": Interval(start=-48.2, end=0)
+	"S-1": Interval(start=-48, end=-42),
+	"S-2": Interval(start=-42, end=-36),
+	"S-2": Interval(start=-36, end=-30),
+	"S-2": Interval(start=-30, end=-24),
 }
 
 S_UNIT_SCALE_VHF = {}
