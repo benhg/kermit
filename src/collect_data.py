@@ -53,7 +53,7 @@ def dbfft(x, fs, win=None, ref=1):
     if win is None:
         win = np.ones([N, 1])
     if len(x) != len(win):
-            raise ValueError('Signal and window must be of the same length')
+        raise ValueError('Signal and window must be of the same length')
     x = x * win
 
     # Calculate real FFT and frequency vector
@@ -65,7 +65,7 @@ def dbfft(x, fs, win=None, ref=1):
     s_mag = np.abs(sp) * 2 / np.sum(win)
 
     # Convert to dBFS
-    s_dbfs = 20 * np.log10(s_mag/ref)
+    s_dbfs = 20 * np.log10(s_mag / ref)
 
     return freq, s_dbfs
 
@@ -91,6 +91,7 @@ def read_signal_str(sdr):
     db_result = avg_db - ANTENNA_FUDGE_FACTOR
     print(db_result)
     return db_result
+
 
 def announce_signal(signal_strength_db, freq, speak_func):
     """
@@ -130,9 +131,10 @@ def main():
         time.sleep(SAMPLE_INTERVAL)
 
         if ANNOUNCE_SIGNAL and (i % ANNOUNCE_SIGNAL_EVERY == 0):
-            announce_signal(signal_strength_db, LISTENING_FREQUENCY, speak_func)
+            announce_signal(signal_strength_db, LISTENING_FREQUENCY,
+                            speak_func)
 
-        i+= 1
+        i += 1
 
 
 if __name__ == '__main__':
