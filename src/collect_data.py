@@ -6,7 +6,7 @@
 At a high-level:
 
 With some frequency defined in a config file:
-- Sample the current signal coming in from the line-in
+- Sample the current signal coming in from the line-in or an RTLSDR
  (we assume this is a radio)
 - Translate to S-units (extended s-unit scale)
 - Collect lat, lng, elevation
