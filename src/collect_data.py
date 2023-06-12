@@ -106,6 +106,9 @@ def read_signal_str(sdr):
     logging.debug(
         f"Signal sample summary: min - {np.min(dbfs)}, max: - {np.max(dbfs)}, average - {np.average(dbfs)}"
     )
+    # TODO - instead of doing the max, we really should specifically take the listening frequency
+    # Or something like the range of the antenna's useful frequencies (requires user config input)
+    # But for almost all practical intents and purposes, the max _is_ the listening frequency
     max_db = np.max(dbfs)
     logging.debug(
         f"Shifting measured signal {max_db} by antenna gain {ANTENNA_FUDGE_FACTOR}"

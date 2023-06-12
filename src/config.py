@@ -29,6 +29,8 @@ A sensible default is 137.00 (MHz), as that is an often-empty frequency in the a
 Set it to something that plays nice with your antenna
 """
 LISTENING_FREQUENCY = 146520000
+
+
 """
 Because s-unit scales are different for VHF vs HF, we need a config parameter to specify to the program whether the user is listening in VHF or HF
 
