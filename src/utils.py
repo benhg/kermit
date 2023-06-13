@@ -96,3 +96,58 @@ def get_platform_speak_func(platform):
         return speak_darwin
     elif platform == "Linux":
         return speak_linux
+
+
+class GpsReadQuality(IntEnum):
+    """
+    GPS read quality (source)
+
+    IntEnum because these have well-defined values
+    So we can cast from an integer freely
+    """
+    INVALID = 0
+    GPS_SPS = 1
+    DGPS = 2
+    PPS = 3
+    REAL_TIME_KINEMATIC = 4
+    FLOAT_RTK = 5
+    ESTIMATED = 6
+    MANUAL_INPUT = 7
+    SIMULATED = 8
+
+
+class GpsResponse:
+    """
+    A read from a GPS GGA signal. Contains the following attributes:
+
+    Details from here: http://www.gpsinformation.org/dale/nmea.htm#GGA
+
+    @var timestamp - the timestamp associated with the read
+    @var lat - latitude
+    @var lng - longitude
+    @var quality - enum representing read quality
+    @var sat_count - number of satellites currently being read.
+    @var altitude - the GPS altitude
+    @var error - the dilution of precision - above 20 == bad.
+    """
+
+    def __init__(self, lat=0, lng=0, quality=GpsReadQuality.INVALID, sat_count=0,altitude=0,error=0):
+        """
+        Constructor for GPS response class
+        """
+        self.lat = lat
+        self.lng = lng
+        self.quality = quality
+        self.sat_count = sat_count
+        self.altitude = altitude
+        self.error = error
+
+
+    def is_valid_read(self):
+        """
+        Return whether this read is trustworthy
+        """
+        return self.quality != GpsReadQuality.INVALID and self.error < 20 and self.sat_count >= 3
+
+    def __repr__(self):
+        return f"GpsResponse<lat={self.lat}, lng={self.lng}, quality={self.quality}, sat_count={self.sat_count}, altitude={self.altitude}, error={self.error}>"
