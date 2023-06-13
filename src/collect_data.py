@@ -141,11 +141,21 @@ def setup_gps_source():
     """
     Find a GPS source over serial and return something that we can read from
 
-    @return a Serial object that can be read for GPS data, or None for failure
+    @return a Serial object that can be read for GPS data
     """
-    port_list = [p for p in list(list_ports.comports()) if "" in p.device]
+    port_list = list(list_ports.comports())
+    logging.debug(f"Candidate GPS devices: [{', '.join([p.device for p in port_list])}]")
+    
+    # If it tells us it is a GPS, we're pretty sure it is a GPS 
+    found_gps_for_sure = False
+    for p in port_list:
+        if "gps" in str(p.product) or "GPS" in str(p.product):
+            port = p.device
+            found_gps_for_sure = True
+            break 
 
-    if len(port_list) > 1:
+    # Otherwise, if there's more than one option, ask the user
+    if len(port_list) > 1 and not found_gps_for_sure:
         port_str = "\n\t" 
         port_str += "\n\t".join([p.device for p in port_list])
         inp = input(f"Which port corresponds to your GPS? Options: {port_str}\n $")
@@ -155,13 +165,25 @@ def setup_gps_source():
                 break
 
     elif len(port_list) == 1:
+        # If there's only one option, we will try it because it's all there is.
         port = port_list[0].device
-    else:
+    elif not found_gps_for_sure:
+        # Otherwise, we fail
         logging.warning("Could not find GPS. Not logging location source")
         return None
+    logging.debug(f"Found GPS source device {port}")
     serial_obj = serial.Serial(port)
     # Wait for it to start returning location data
-    return serial_obj
+    for _ in range(GPS_POLL_SEC):
+        gps_response = get_gga_signal_from_serial(serial_obj)
+        if gps_response.is_valid_read():
+            logging.info(f"Found properly functioning GPS device at {port}")
+            return serial_obj
+        time.sleep(1)
+
+    # If we get here, we've tried for the max timeout. Give up
+    logging.error(f"Polled for {GPS_POLL_SEC} seconds but could not get valid signal from GPS. No location services available")
+    return None
 
 
 def main():
