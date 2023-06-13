@@ -137,6 +137,56 @@ def get_current_location():
     logging.warning(f"Location detection is not yet implemented")
     return 0, 0
 
+def get_gga_signal_from_serial(serial_obj):
+    """
+    Given a GPS serial object, decode the GGA signal, and return relevant information
+
+    @param serial_obj - a serial object that is a GPS unit
+    @return - timestamp, lat, lng, quality, number of satellites, altitude
+    """
+    line = serial_obj.readline().decode('utf-8')
+    # Only use GPGGA signal type
+    line_found = False
+    while not line_found:
+        if "GPGGA" in line:
+            logging.debug("Found GPGGA signal from GPS unit")
+            line_found = True
+            break
+        line = serial_obj.readline().decode('utf-8')
+
+    # Process the GPGGA signal, return the serial object
+    # The GPGGA signal is well-defined (for decades), 
+    # so we can be a bit hacky here and get away with it.
+    line_split = line.split(",")
+    res = GpsResponse(timestamp=line_split[1], quality=GpsReadQuality(int(line_split[6])), sat_count=int(line_split[7]), altitude=float(line_split[9]), error=float(line_split[8]))
+
+    # Converting the degrees from NMEA to decimal is kind of annoying
+    lat = line_split[2]
+    lat_dir = line_split[3]
+    lng = line_split[4]
+    lng_dir = line_split[5]
+
+    print(lng_dir)
+
+    lat_deg = lat[0:2]
+    lat_min = lat[2:]
+    lng_deg = lng[0:3]
+    lng_min = lng[3:]
+
+    latitude = float(lat_deg) + (float(lat_min) / 60)
+    longitude = float(lng_deg) + (float(lng_min) / 60)
+
+    if lat_dir == "S":
+        latitude *= -1
+    if lng_dir == "W":
+        longitude *= -1
+    print(latitude, longitude)
+
+    print(f"Read GGA signal {res} successfully")
+    logging.debug(f"Read GGA signal {res} successfully")
+    return res
+
+
 def setup_gps_source():
     """
     Find a GPS source over serial and return something that we can read from
