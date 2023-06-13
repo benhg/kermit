@@ -1,3 +1,4 @@
 pyrtlsdr
 numpy
 scipy
+pyserial

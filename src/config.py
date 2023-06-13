@@ -59,6 +59,9 @@ ANTENNA_FUDGE_FACTOR = 0
 Set the program's signal source.
 Today, RTLSDR and LINE IN are supported
 Defaults to RTLSDR
+
+Note that LINE IN only will work if set to recieve in AM mode.
+FM simply will not work as FM signal strength is not correlated to audio volume.
 """
 SIGNAL_SOURCE = SignalSource.RTLSDR
 """

@@ -27,11 +27,17 @@ import subprocess
 import logging
 
 from rtlsdr import RtlSdr
+import serial
+from serial.tools import list_ports
 
 from config import SAMPLE_INTERVAL, SignalSource, SIGNAL_SOURCE, RtlSdrSettings, ANTENNA_FUDGE_FACTOR,\
                    LISTENING_FREQUENCY, ANNOUNCE_SIGNAL, ANNOUNCE_SIGNAL_EVERY, S_UNIT_SCALE
 from utils import get_platform_speak_func
 
+"""
+If we don't find a GPS, still announce signal but don't store location data
+"""
+store_location = True
 
 def get_s_unit_from_db(signal_strength_db):
     """
@@ -131,6 +137,32 @@ def get_current_location():
     logging.warning(f"Location detection is not yet implemented")
     return 0, 0
 
+def setup_gps_source():
+    """
+    Find a GPS source over serial and return something that we can read from
+
+    @return a Serial object that can be read for GPS data, or None for failure
+    """
+    port_list = [p for p in list(list_ports.comports()) if "" in p.device]
+
+    if len(port_list) > 1:
+        port_str = "\n\t" 
+        port_str += "\n\t".join([p.device for p in port_list])
+        inp = input(f"Which port corresponds to your GPS? Options: {port_str}\n $")
+        for port_obj in port_list:
+            if port_obj.device == inp:
+                port = port_obj.device
+                break
+
+    elif len(port_list) == 1:
+        port = port_list[0].device
+    else:
+        logging.warning("Could not find GPS. Not logging location source")
+        return None
+    serial_obj = serial.Serial(port)
+    # Wait for it to start returning location data
+    return serial_obj
+
 
 def main():
     """
@@ -140,6 +172,12 @@ def main():
     system = platform.system()
     logging.debug(f"Found platform {system}")
     speak_func = get_platform_speak_func(system)
+
+    gps_stream = setup_gps_source()
+
+    if gps_stream == None:
+        logging.warning("GPS source not found. Not storing location data")
+        store_location = False
 
     # Leave this obj as None if we are not using the RTLSDR
     sdr = None
