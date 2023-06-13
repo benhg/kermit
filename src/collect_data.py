@@ -33,11 +33,11 @@ from serial.tools import list_ports
 from config import SAMPLE_INTERVAL, SignalSource, SIGNAL_SOURCE, RtlSdrSettings, ANTENNA_FUDGE_FACTOR,\
                    LISTENING_FREQUENCY, ANNOUNCE_SIGNAL, ANNOUNCE_SIGNAL_EVERY, S_UNIT_SCALE
 from utils import get_platform_speak_func
-
 """
 If we don't find a GPS, still announce signal but don't store location data
 """
 store_location = True
+
 
 def get_s_unit_from_db(signal_strength_db):
     """
@@ -137,6 +137,7 @@ def get_current_location():
     logging.warning(f"Location detection is not yet implemented")
     return 0, 0
 
+
 def get_gga_signal_from_serial(serial_obj):
     """
     Given a GPS serial object, decode the GGA signal, and return relevant information
@@ -155,19 +156,23 @@ def get_gga_signal_from_serial(serial_obj):
         line = serial_obj.readline().decode('utf-8')
 
     # Process the GPGGA signal, return the serial object
-    # The GPGGA signal is well-defined (for decades), 
+    # The GPGGA signal is well-defined (for decades),
     # so we can be a bit hacky here and get away with it.
     line_split = line.split(",")
-    res = GpsResponse(timestamp=line_split[1], quality=GpsReadQuality(int(line_split[6])), sat_count=int(line_split[7]), altitude=float(line_split[9]), error=float(line_split[8]))
+    res = GpsResponse(timestamp=line_split[1],
+                      quality=GpsReadQuality(int(line_split[6])),
+                      sat_count=int(line_split[7]),
+                      altitude=float(line_split[9]),
+                      error=float(line_split[8]))
 
     # Converting the degrees from NMEA to decimal is kind of annoying
+    # The format is "ddmm.mmm" for latitude, and
+    # "dddmm.mmmmm" for longitude
+    # Direction is encoded in the next entry
     lat = line_split[2]
     lat_dir = line_split[3]
     lng = line_split[4]
     lng_dir = line_split[5]
-
-    print(lng_dir)
-
     lat_deg = lat[0:2]
     lat_min = lat[2:]
     lng_deg = lng[0:3]
@@ -180,9 +185,8 @@ def get_gga_signal_from_serial(serial_obj):
         latitude *= -1
     if lng_dir == "W":
         longitude *= -1
-    print(latitude, longitude)
-
-    print(f"Read GGA signal {res} successfully")
+    res.lat = latitude
+    res.lng = longitude
     logging.debug(f"Read GGA signal {res} successfully")
     return res
 
@@ -194,21 +198,23 @@ def setup_gps_source():
     @return a Serial object that can be read for GPS data
     """
     port_list = list(list_ports.comports())
-    logging.debug(f"Candidate GPS devices: [{', '.join([p.device for p in port_list])}]")
-    
-    # If it tells us it is a GPS, we're pretty sure it is a GPS 
+    logging.debug(
+        f"Candidate GPS devices: [{', '.join([p.device for p in port_list])}]")
+
+    # If it tells us it is a GPS, we're pretty sure it is a GPS
     found_gps_for_sure = False
     for p in port_list:
         if "gps" in str(p.product) or "GPS" in str(p.product):
             port = p.device
             found_gps_for_sure = True
-            break 
+            break
 
     # Otherwise, if there's more than one option, ask the user
     if len(port_list) > 1 and not found_gps_for_sure:
-        port_str = "\n\t" 
+        port_str = "\n\t"
         port_str += "\n\t".join([p.device for p in port_list])
-        inp = input(f"Which port corresponds to your GPS? Options: {port_str}\n $")
+        inp = input(
+            f"Which port corresponds to your GPS? Options: {port_str}\n $")
         for port_obj in port_list:
             if port_obj.device == inp:
                 port = port_obj.device
@@ -232,7 +238,9 @@ def setup_gps_source():
         time.sleep(1)
 
     # If we get here, we've tried for the max timeout. Give up
-    logging.error(f"Polled for {GPS_POLL_SEC} seconds but could not get valid signal from GPS. No location services available")
+    logging.error(
+        f"Polled for {GPS_POLL_SEC} seconds but could not get valid signal from GPS. No location services available"
+    )
     return None
 
 

@@ -130,8 +130,13 @@ class GpsResponse:
     @var altitude - the GPS altitude
     @var error - the dilution of precision - above 20 == bad.
     """
-
-    def __init__(self, lat=0, lng=0, quality=GpsReadQuality.INVALID, sat_count=0,altitude=0,error=0):
+    def __init__(self,
+                 lat=0,
+                 lng=0,
+                 quality=GpsReadQuality.INVALID,
+                 sat_count=0,
+                 altitude=0,
+                 error=0):
         """
         Constructor for GPS response class
         """
@@ -141,7 +146,6 @@ class GpsResponse:
         self.sat_count = sat_count
         self.altitude = altitude
         self.error = error
-
 
     def is_valid_read(self):
         """

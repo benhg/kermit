@@ -29,8 +29,6 @@ A sensible default is 137.00 (MHz), as that is an often-empty frequency in the a
 Set it to something that plays nice with your antenna
 """
 LISTENING_FREQUENCY = 146520000
-
-
 """
 Because s-unit scales are different for VHF vs HF, we need a config parameter to specify to the program whether the user is listening in VHF or HF
 
@@ -80,13 +78,11 @@ ANNOUNCE_SIGNAL = True
 Every _n_ samples, announce the signal
 """
 ANNOUNCE_SIGNAL_EVERY = 5
-
 """
 The output file path. We recommend ending it with `.csv`, as it will be a CSV
 It will be appended to by the program. Move the old file yourself if you want a fresh start
 """
 OUTPUT_FILE = "~/Desktop/rf_mapper.csv"
-
 """
 How long in seconds should we wait before giving up on using GPS?
 """
