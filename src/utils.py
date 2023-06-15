@@ -7,7 +7,7 @@
 Map dB ranges to S-units, for clear annunciation
 """
 import subprocess
-
+from enum import IntEnum
 
 class Interval():
     """
@@ -129,6 +129,7 @@ class GpsResponse:
     @var sat_count - number of satellites currently being read.
     @var altitude - the GPS altitude
     @var error - the dilution of precision - above 20 == bad.
+    @var timestamp - timestamp of read
     """
     def __init__(self,
                  lat=0,
@@ -136,7 +137,8 @@ class GpsResponse:
                  quality=GpsReadQuality.INVALID,
                  sat_count=0,
                  altitude=0,
-                 error=0):
+                 error=0,
+                 timestamp=0):
         """
         Constructor for GPS response class
         """
@@ -146,6 +148,7 @@ class GpsResponse:
         self.sat_count = sat_count
         self.altitude = altitude
         self.error = error
+        self.timestamp = timestamp
 
     def is_valid_read(self):
         """
@@ -154,4 +157,5 @@ class GpsResponse:
         return self.quality != GpsReadQuality.INVALID and self.error < 20 and self.sat_count >= 3
 
     def __repr__(self):
-        return f"GpsResponse<lat={self.lat}, lng={self.lng}, quality={self.quality}, sat_count={self.sat_count}, altitude={self.altitude}, error={self.error}>"
+        return f"GpsResponse<lat={self.lat}, lng={self.lng}, quality={GpsReadQuality(self.quality).name}, sat_count={self.sat_count}, altitude={self.altitude}, error={self.error}, timestamp={self.timestamp}>"
+

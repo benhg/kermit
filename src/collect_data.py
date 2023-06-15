@@ -31,8 +31,8 @@ import serial
 from serial.tools import list_ports
 
 from config import SAMPLE_INTERVAL, SignalSource, SIGNAL_SOURCE, RtlSdrSettings, ANTENNA_FUDGE_FACTOR,\
-                   LISTENING_FREQUENCY, ANNOUNCE_SIGNAL, ANNOUNCE_SIGNAL_EVERY, S_UNIT_SCALE
-from utils import get_platform_speak_func
+                   LISTENING_FREQUENCY, ANNOUNCE_SIGNAL, ANNOUNCE_SIGNAL_EVERY, S_UNIT_SCALE, GPS_POLL_SEC
+from utils import get_platform_speak_func, GpsReadQuality, GpsResponse
 """
 If we don't find a GPS, still announce signal but don't store location data
 """
@@ -133,11 +133,6 @@ def announce_signal(signal_strength_s_unit, speak_func):
     speak_func(signal_strength_s_unit)
 
 
-def get_current_location():
-    logging.warning(f"Location detection is not yet implemented")
-    return 0, 0
-
-
 def get_gga_signal_from_serial(serial_obj):
     """
     Given a GPS serial object, decode the GGA signal, and return relevant information
@@ -187,7 +182,7 @@ def get_gga_signal_from_serial(serial_obj):
         longitude *= -1
     res.lat = latitude
     res.lng = longitude
-    logging.debug(f"Read GGA signal {res} successfully")
+    logging.info(f"Read GGA signal {res} successfully")
     return res
 
 
@@ -277,15 +272,23 @@ def main():
     # Iteration counter. Used for announcing the signal strength every however often
     i = 0
     while True:
+        
+        # Get and process the signal strength
         signal_strength_db = read_signal_str(sdr)
         signal_strength_s_unit = get_s_unit_from_db(signal_strength_db)
-        lat, lng = get_current_location()
-
         logging.info(
-            f"Signal strength {signal_strength_db} dB ({signal_strength_db}). Location: ({lat}, {lng})"
+            f"Signal strength {signal_strength_db} dB ({signal_strength_db})."
         )
-        time.sleep(SAMPLE_INTERVAL)
 
+        gps_read = None
+
+        # Get and process the location
+        if gps_stream is not None:
+            gps_read = get_gga_signal_from_serial(gps_stream)
+
+
+
+        time.sleep(SAMPLE_INTERVAL)
         if ANNOUNCE_SIGNAL and (i % ANNOUNCE_SIGNAL_EVERY == 0):
             logging.debug(
                 f"Announcing signal strength {signal_strength_db} dB ({signal_strength_db})"
