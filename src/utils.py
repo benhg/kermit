@@ -9,6 +9,7 @@ Map dB ranges to S-units, for clear annunciation
 import subprocess
 from enum import IntEnum
 
+
 class Interval():
     """
     This class represents a range between two numbers
@@ -158,4 +159,3 @@ class GpsResponse:
 
     def __repr__(self):
         return f"GpsResponse<lat={self.lat}, lng={self.lng}, quality={GpsReadQuality(self.quality).name}, sat_count={self.sat_count}, altitude={self.altitude}, error={self.error}, timestamp={self.timestamp}>"
-

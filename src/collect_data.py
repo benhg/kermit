@@ -41,11 +41,14 @@ from utils import get_platform_speak_func, GpsReadQuality, GpsResponse
 If we don't find a GPS, still announce signal but don't store location data
 """
 store_location = True
-
 """
 The shape of the output CSV file
 """
-CSV_COLUMNS = ["timestamp", "signal_strength_db", "signal_strength_s_unit", "latitude", "longitude", "elevation"]
+CSV_COLUMNS = [
+    "timestamp", "signal_strength_db", "signal_strength_s_unit", "latitude",
+    "longitude", "elevation"
+]
+
 
 def get_s_unit_from_db(signal_strength_db):
     """
@@ -251,7 +254,9 @@ def setup_gps_source():
     )
     return None
 
-def save_read_to_file(expanded_out_file, signal_strength_db, signal_strength_s_unit, gps_read):
+
+def save_read_to_file(expanded_out_file, signal_strength_db,
+                      signal_strength_s_unit, gps_read):
     """
     Save a single sample to the CSV file. Assumes we've set it up already
     and there is a correctly populated header.
@@ -263,7 +268,10 @@ def save_read_to_file(expanded_out_file, signal_strength_db, signal_strength_s_u
 
     row_dict["timestamp"] = str(datetime.datetime.now())
 
-    ["timestamp", "signal_strength_db", "signal_strength_s_unit", "latitude", "longitude", "elevation"]
+    [
+        "timestamp", "signal_strength_db", "signal_strength_s_unit",
+        "latitude", "longitude", "elevation"
+    ]
     # Populate GPS reads if the GPS read is a valid object
     if gps_read is not None:
         row_dict["latitude"] = gps_read.lat
@@ -284,11 +292,12 @@ def init_output_file(expanded_out_file):
     Write the CSV header to the output file
     """
     new_file = True
-    
+
     if os.path.exists(expanded_out_file):
         new_file = False
         logging.warning(f"Output file {expanded_out_file} exists already")
-        response = input("Do you want to overwrite the existing output file? y/N\n")
+        response = input(
+            "Do you want to overwrite the existing output file? y/N\n")
         if response == "y" or response == "Y":
             new_file = True
 
@@ -300,7 +309,6 @@ def init_output_file(expanded_out_file):
     with open(expanded_out_file, "w") as fh:
         writer = csv.writer(fh)
         writer.writerow(CSV_COLUMNS)
-
 
 
 def main():
@@ -325,7 +333,9 @@ def main():
 
     response = init_output_file(expanded_out_file)
     if response == False:
-        logging.error("Failed to create output file. Please verify your supplied output file path is free, or you are okay overwriting it")
+        logging.error(
+            "Failed to create output file. Please verify your supplied output file path is free, or you are okay overwriting it"
+        )
         sys.exit(1)
 
     if SIGNAL_SOURCE == SignalSource.RTLSDR:
@@ -345,13 +355,12 @@ def main():
     # Iteration counter. Used for announcing the signal strength every however often
     i = 0
     while True:
-        
+
         # Get and process the signal strength
         signal_strength_db = read_signal_str(sdr)
         signal_strength_s_unit = get_s_unit_from_db(signal_strength_db)
         logging.info(
-            f"Signal strength {signal_strength_db} dB ({signal_strength_db})."
-        )
+            f"Signal strength {signal_strength_db} dB ({signal_strength_db}).")
 
         gps_read = None
 
@@ -359,9 +368,8 @@ def main():
         if gps_stream is not None:
             gps_read = get_gga_signal_from_serial(gps_stream)
 
-
-        save_read_to_file(expanded_out_file, signal_strength_db, signal_strength_s_unit, gps_read)
-
+        save_read_to_file(expanded_out_file, signal_strength_db,
+                          signal_strength_s_unit, gps_read)
 
         time.sleep(SAMPLE_INTERVAL)
         if ANNOUNCE_SIGNAL and (i % ANNOUNCE_SIGNAL_EVERY == 0):

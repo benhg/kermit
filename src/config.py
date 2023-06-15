@@ -83,13 +83,11 @@ ANNOUNCE_SIGNAL = True
 Every _n_ samples, announce the signal
 """
 ANNOUNCE_SIGNAL_EVERY = 5
-
 """
 The output file path. We recommend ending it with `.csv`, as it will be a CSV
 It will be appended to by the program. Move the old file yourself if you want a fresh start
 """
 OUTPUT_FILE = "~/Desktop/rf_mapper.csv"
-
 """
 How long in seconds should we wait before giving up on using GPS?
 """
