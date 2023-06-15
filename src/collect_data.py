@@ -147,6 +147,9 @@ def get_gga_signal_from_serial(serial_obj):
         if "GPGGA" in line:
             logging.debug("Found GPGGA signal from GPS unit")
             line_found = True
+            line_split = line.split(",")
+            if int(line_split[6]) == 0:
+                return None
             break
         line = serial_obj.readline().decode('utf-8')
 
@@ -227,6 +230,8 @@ def setup_gps_source():
     # Wait for it to start returning location data
     for _ in range(GPS_POLL_SEC):
         gps_response = get_gga_signal_from_serial(serial_obj)
+        if gps_response is None:
+            continue
         if gps_response.is_valid_read():
             logging.info(f"Found properly functioning GPS device at {port}")
             return serial_obj

@@ -2,6 +2,7 @@
 @file config.py
 
 @brief This file maintains configuration details for the program
+
 """
 
 from enum import Enum, auto
@@ -18,6 +19,7 @@ class SignalSource(Enum):
     # A microphone plugged into line-in
     # For mac, we assume the headphone port is being used for line-in
     # For others, line in is assumed
+    # Note - line-in will only ever work for AM signals. Make sure your radio is set to AM mode.
     LINE_IN = auto()
     # TODO more like USB line in etc
 
@@ -25,14 +27,17 @@ class SignalSource(Enum):
 """
 The frequency to listen on, in Hz
 
-A sensible default is 137.00 (MHz), as that is an often-empty frequency in the aircraft band
-Set it to something that plays nice with your antenna
+A sensible default is 146.52 (MHz), as that is an often-empty conventional simplex frequency.
+
+It's usually pretty easy to make test transmissions on that frequency
+
+Set it to something that plays nice with your antenna and radio.
 """
 LISTENING_FREQUENCY = 146520000
 """
 Because s-unit scales are different for VHF vs HF, we need a config parameter to specify to the program whether the user is listening in VHF or HF
 
-We expect most users to use VHF, so we will default to that
+Default is set based on listening frequency but can be overridden if necessary
 """
 S_UNIT_SCALE = S_UNIT_SCALE_VHF if LISTENING_FREQUENCY >= 3e7 else S_UNIT_SCALE_HF
 
@@ -78,11 +83,13 @@ ANNOUNCE_SIGNAL = True
 Every _n_ samples, announce the signal
 """
 ANNOUNCE_SIGNAL_EVERY = 5
+
 """
 The output file path. We recommend ending it with `.csv`, as it will be a CSV
 It will be appended to by the program. Move the old file yourself if you want a fresh start
 """
 OUTPUT_FILE = "~/Desktop/rf_mapper.csv"
+
 """
 How long in seconds should we wait before giving up on using GPS?
 """
