@@ -273,6 +273,8 @@ def main():
         atexit.register(sdr.close)
     else:
         logging.debug("Using signal source LINE IN")
+        logging.warning("LINE IN signal source is not yet supported")
+        sys.exit(0)
 
     # Iteration counter. Used for announcing the signal strength every however often
     i = 0
