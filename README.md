@@ -94,6 +94,8 @@ We still plan to implement this in a limited way with some workarounds/hacks:
 
 ## Secondary Tool: The Posterboard Yagi
 
+Since this is a "toolkit", and not just one program, I thought I'd include something else I'm doing for this same project. I built a Yagi antenna on a posterboard, which I use for finer-grained searching. The basic idea is to drive around the area collecting map data, then going back armed with the map we created along with a directional antenna in order to search more specifically. I built the antenna to these specs:
+
 ```
 https://www.changpuak.ch/electronics/yagi_uda_antenna.php
 Javascript Version 12.01.2014, based on Rothammel / DL6WU
@@ -123,3 +125,23 @@ Directors / Parasitics are isolated.
 Please choose an isolater thicker than : 11 mm
 
 ```
+
+I used some 12-gauge wire I had lying around and a posterboard. I laid out all the wire on the posterboard and kept it in place with some packing tape. I punched the two halves of the dipole through the back of the posterboard and put them into a screw-terminal BNC connector. Then I used a BNC to SMA cable to plug into my HT. There are some progress pictures below.
+
+Here are the parts laid out on the floor (the cat was helpful, but not necessary for the project)
+
+![Parts for the posterboard Yagi](img/parts.jpeg)
+
+The wires after being measured and attached to the posterboard. I found that I didn't quite have the space for the reflector elements (I should have bought a posterboard one-size up), so I cut out some of the unused space at the top and attached it to the back
+
+![The wires after being measured and attached to the posterboard](img/wires.jpeg)
+
+I punched the two halves of the dipole through the antenna and connected to a screw-terminal BNC connector I had lying around. After I was sure I had a good contact, I put some liquid electrical tape on the connection to make sure the two elements don't touch each other.
+
+![The wires after being measured and attached to the posterboard](img/connector.jpeg)
+
+After connecting everything up, attaching a BNC to SMA coax cable, and testing it, I cut out some of the unused area on the posterboard. That makes it a bit easier to hold.
+
+![Finished product](img/finished.jpeg)
+
+I also plan to build a step attenuator so that I can narrow down the strengths of signals I identify systematically. I'll add details here when I do that.
