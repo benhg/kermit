@@ -101,3 +101,10 @@ AUTO_OPEN_MAP = True
 How long in seconds should we wait before giving up on using GPS?
 """
 GPS_POLL_SEC = 30
+"""
+De-duplicate consecutive entries from the same location
+This is useful for things like getting stuck at a red light, where you end up lighting up the heat maps,
+because there are too many samples in one place
+The downside is that you only keep one sample per place, so you are essentially cutting out some time
+"""
+DEDUPLICATE = True
