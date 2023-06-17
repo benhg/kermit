@@ -105,6 +105,8 @@ class GpsReadQuality(IntEnum):
 
     IntEnum because these have well-defined values
     So we can cast from an integer freely
+
+    See https://www.oc.nps.edu/oc2902w/gps/gpsacc.html for some details
     """
     INVALID = 0
     GPS_SPS = 1

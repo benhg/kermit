@@ -28,6 +28,7 @@ import logging
 import csv
 import os
 import datetime
+import sys
 
 from rtlsdr import RtlSdr
 import serial
@@ -189,14 +190,16 @@ def get_gga_signal_from_serial(serial_obj):
 
     latitude = float(lat_deg) + (float(lat_min) / 60)
     longitude = float(lng_deg) + (float(lng_min) / 60)
-
     if lat_dir == "S":
         latitude *= -1
     if lng_dir == "W":
         longitude *= -1
-    res.lat = latitude
-    res.lng = longitude
+
+    # Relevant XKCD - https://xkcd.com/2170/
+    res.lat = format(latitude, ".5f")
+    res.lng = format(longitude, ".5f")
     logging.info(f"Read GGA signal {res} successfully")
+
     return res
 
 
@@ -363,7 +366,7 @@ def main():
         signal_strength_db = read_signal_str(sdr)
         signal_strength_s_unit = get_s_unit_from_db(signal_strength_db)
         logging.info(
-            f"Signal strength {signal_strength_db} dB ({signal_strength_s_unit})."
+            f"Signal strength {format(signal_strength_db, '.3f')} dB ({signal_strength_s_unit})."
         )
 
         gps_read = None
