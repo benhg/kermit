@@ -1,4 +1,4 @@
-# The Kinematic RF Mapping and Identification Toolkit (KRMIT)
+# The Known Electromagnetic Radiation Mapping and Identification Toolkit (KERMIT)
 
 This program is designed to create a map of points along which the RF background has been measured. It's divided up into the following parts:
 
@@ -48,17 +48,25 @@ When you are done sampling, do a ctrl-C. You should see output get appended to t
 
 NOTE: Map generation is not yet implemented.
 
-To generate a map after doing some sampling, make sure the OUTPUT_FILE set in the `config.py` maps to a correctly populated output CSV created by the sampling process, and run `python3 generate_map.py`
+To generate a map after doing some sampling, make sure the OUTPUT_FILE set in the `config.py` maps to a correctly populated output CSV created by the sampling process, and run `python3 generate_map.py`. The output map will be generated with the same filename as the CSV output file, but there will be a `.jpg` extension instead of a `.csv` one.
 
 ## Hardware setup
 
 I used the following components in my testing:
 
-https://www.amazon.com/dp/B07HQ8SJ5P/ref=sspa_dk_detail_1?pd_rd_i=B07HQ8SJ5P&pd_rd_w=D0Bpc&content-id=amzn1.sym.7b21e0c7-2d6d-4279-a40b-74d2b0593b5a&pf_rd_p=7b21e0c7-2d6d-4279-a40b-74d2b0593b5a&pf_rd_r=QJ8TKX5ZZZ15ZGASEW3E&pd_rd_wg=OWuVG&pd_rd_r=21fd0645-0d38-48cd-ae85-748161aae7f1&s=aht&sp_csd=d2lkZ2V0TmFtZT1zcF9kZXRhaWxfdGhlbWF0aWM&th=1
+1. 2017 macbook pro
+2. A 150w inverter (so I can provide power to the laptop from my car)
+3. The rubber-duck antenna that came with my Yaesu FT70DR
+4. The Yaesu FT70DR (to generate known strong signals)
+5. A [Diamond MR77](https://www.diamondantenna.net/mr77.html) mag-mount antenna
+6. [PL259 to SMA adapter](https://www.amazon.com/DHT-Electronics-coaxial-cable-assembly/dp/B00CP11O3E/ref=sr_1_3?crid=2JSP4RETUV2DU&keywords=pl259+male+to+sma+male&qid=1686025830&s=electronics&sprefix=%2Celectronics%2C472&sr=1-3)
+7. [This USB GPS antenna](https://www.amazon.com/dp/B078Y52FGQ/ref=sspa_dk_detail_1?psc=1&pd_rd_i=B078Y52FGQ&pd_rd_w=g1H1R&content-id=amzn1.sym.0d1092dc-81bb-493f-8769-d5c802257e94&pf_rd_p=0d1092dc-81bb-493f-8769-d5c802257e94&pf_rd_r=CMR9RQGK22T88FS55B16&pd_rd_wg=KCoqn&pd_rd_r=327dd856-8a30-45a2-abfb-00da5c88df20&s=aht&sp_csd=d2lkZ2V0TmFtZT1zcF9kZXRhaWwy)
+8. Some USB-C to USB-A converters
+9. an [RTLSDR V3](https://www.rtl-sdr.com/buy-rtl-sdr-dvb-t-dongles/)
 
-https://www.amazon.com/DHT-Electronics-coaxial-cable-assembly/dp/B00CP11O3E/ref=sr_1_3?crid=2JSP4RETUV2DU&keywords=pl259+male+to+sma+male&qid=1686025830&s=electronics&sprefix=%2Celectronics%2C472&sr=1-3
+The hardware setup is pretty straightforward. You kind of just plug everything into each other. It really goes together only one way. Make sure the antenna and GPS are placed in reasonable locations. I have had success walking around with the laptop in a backpackand the antennas sticking out the top. When driving, I was able to simply place the GPS antenna on my dashboard, and connect the RTLSDR to the mag-mount antenna on my roof.
 
-https://www.amazon.com/dp/B078Y52FGQ/ref=sspa_dk_detail_1?psc=1&pd_rd_i=B078Y52FGQ&pd_rd_w=g1H1R&content-id=amzn1.sym.0d1092dc-81bb-493f-8769-d5c802257e94&pf_rd_p=0d1092dc-81bb-493f-8769-d5c802257e94&pf_rd_r=CMR9RQGK22T88FS55B16&pd_rd_wg=KCoqn&pd_rd_r=327dd856-8a30-45a2-abfb-00da5c88df20&s=aht&sp_csd=d2lkZ2V0TmFtZT1zcF9kZXRhaWwy
+Here are some pictures of my setup:
 
 
 ## Sampling via line-in
