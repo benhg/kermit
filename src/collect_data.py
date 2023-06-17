@@ -35,7 +35,7 @@ from serial.tools import list_ports
 
 from config import SAMPLE_INTERVAL, SignalSource, SIGNAL_SOURCE, RtlSdrSettings, ANTENNA_FUDGE_FACTOR,\
                    LISTENING_FREQUENCY, ANNOUNCE_SIGNAL, ANNOUNCE_SIGNAL_EVERY, S_UNIT_SCALE, GPS_POLL_SEC,\
-                   OUTPUT_FILE
+                   OUTPUT_FILE_CSV
 from utils import get_platform_speak_func, GpsReadQuality, GpsResponse
 """
 If we don't find a GPS, still announce signal but don't store location data
@@ -320,7 +320,7 @@ def main():
     logging.debug(f"Found platform {system}")
     speak_func = get_platform_speak_func(system)
 
-    expanded_out_file = os.path.expandvars(os.path.expanduser(OUTPUT_FILE))
+    expanded_out_file = os.path.expandvars(os.path.expanduser(OUTPUT_FILE_CSV))
 
     gps_stream = setup_gps_source()
 
@@ -363,7 +363,8 @@ def main():
         signal_strength_db = read_signal_str(sdr)
         signal_strength_s_unit = get_s_unit_from_db(signal_strength_db)
         logging.info(
-            f"Signal strength {signal_strength_db} dB ({signal_strength_s_unit}).")
+            f"Signal strength {signal_strength_db} dB ({signal_strength_s_unit})."
+        )
 
         gps_read = None
 

@@ -84,10 +84,19 @@ Every _n_ samples, announce the signal
 """
 ANNOUNCE_SIGNAL_EVERY = 5
 """
-The output file path. We recommend ending it with `.csv`, as it will be a CSV
-It will be appended to by the program. Move the old file yourself if you want a fresh start
+The output file path.
+
+Only set OUTPUT_FILE_BASE. The OUTPUT_FILE_CSV and OUTPUT_FILE_MAP will be computed.
+
+The program will ask you before overwriting, but won't automatically create new filenames.
 """
-OUTPUT_FILE = "~/Desktop/rf_mapper.csv"
+OUTPUT_FILE_BASE = "~/Desktop/rf_mapper"
+OUTPUT_FILE_CSV = f"{OUTPUT_FILE_BASE}.csv"
+OUTPUT_FILE_MAP = f"{OUTPUT_FILE_BASE}.html"
+"""
+Should we auto-open the map in your browser?
+"""
+AUTO_OPEN_MAP = True
 """
 How long in seconds should we wait before giving up on using GPS?
 """

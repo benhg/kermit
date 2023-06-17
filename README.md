@@ -46,9 +46,9 @@ INFO:root:Read GGA signal GpsResponse<lat=<obscured>, lng=<obscured>, quality=GP
 ```
 When you are done sampling, do a ctrl-C. You should see output get appended to the file you specified with OUTPUT_FILE as the collection happens.
 
-NOTE: Map generation is not yet implemented.
+To generate a map after doing some sampling, make sure the OUTPUT_FILE set in the `config.py` maps to a correctly populated output CSV created by the sampling process, and run `python3 generate_map.py`. The output map will be generated with the same filename as the CSV output file, but there will be a `.html` extension instead of a `.csv` one.
 
-To generate a map after doing some sampling, make sure the OUTPUT_FILE set in the `config.py` maps to a correctly populated output CSV created by the sampling process, and run `python3 generate_map.py`. The output map will be generated with the same filename as the CSV output file, but there will be a `.jpg` extension instead of a `.csv` one.
+The generated map is an interactive HTML file generated with Plotly and OpenStreetMap. You can choose via `config.py` to open it in the browser (Python will automatically open your browser), save it to an output `.html` file, or both.
 
 ## Hardware setup
 

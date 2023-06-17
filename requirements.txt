@@ -2,3 +2,5 @@ pyrtlsdr
 numpy
 scipy
 pyserial
+pandas
+plotly
