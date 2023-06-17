@@ -342,6 +342,9 @@ def main():
         # Configure the RTLSDR if we want it
         logging.debug("Using signal source RTLSDR")
         sdr = RtlSdr()
+        if LISTENING_FREQUENCY <= 3e7:
+            # For HF frequencies, we will get better results out of direct sampling
+            sdr.set_direct_sampling(True)
         sdr.sample_rate = RtlSdrSettings.sample_rate
         sdr.center_freq = RtlSdrSettings.center_freq
         sdr.freq_correction = RtlSdrSettings.freq_correction
@@ -360,7 +363,7 @@ def main():
         signal_strength_db = read_signal_str(sdr)
         signal_strength_s_unit = get_s_unit_from_db(signal_strength_db)
         logging.info(
-            f"Signal strength {signal_strength_db} dB ({signal_strength_db}).")
+            f"Signal strength {signal_strength_db} dB ({signal_strength_s_unit}).")
 
         gps_read = None
 
