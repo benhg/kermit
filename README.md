@@ -24,7 +24,7 @@ Please feel free to open an issue or leave a comment with suggestions, requests,
 
 There are some things you need to do to set up the software. Some requirements can not be specified in the `requirements.txt`, as that only works for Python libraries. 
 
-0. Make your copy of the source code. `git clone git@github.com:benhg/rf-mapper.git` and `cd rf-mapper`
+0. Make your copy of the source code. `git clone git@github.com:benhg/kermit.git` and `cd kermit`
 1. Install python. This was tested on Python 3.9, but any version newer than Python 3.6 should work.
 2. (optional) set up a virtual environment `virtualenv rf-mapper` and `source rf-mapper/bin/activate`
 3. Install LibRTLSdr (system .so libraries). `brew install librtlsdr` on mac, or `[apt | yum] install librtlsdr`
