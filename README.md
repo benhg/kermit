@@ -66,8 +66,19 @@ I used the following components in my testing:
 
 The hardware setup is pretty straightforward. You kind of just plug everything into each other. It really goes together only one way. Make sure the antenna and GPS are placed in reasonable locations. I have had success walking around with the laptop in a backpackand the antennas sticking out the top. When driving, I was able to simply place the GPS antenna on my dashboard, and connect the RTLSDR to the mag-mount antenna on my roof.
 
-Here are some pictures of my setup:
+Here are some pictures of my setup(s):
 
+The test-setup on my dining room table. I screwed the rubberduck antenna from my Yaesu FT70DR onto the SMA input of the RTLSDR for test transmissions. I like those USB-C converters because they let me use both ports next to each other, regardless of how bigthe components are. The RTLSDR is kind of chunky.
+
+![The test-setup on my dining room table](img/table.jpeg)
+
+The GPS sitting on my dashboard. I've had no problems with GPS reception there.
+
+![The GPS sitting on my dashboard](img/gps.jpeg)
+
+The whole setup in my passenger seat. The RTLSDR is connected to the feed line of my antenna on the roof. The inverter powers the laptop, which powers the GPS and the RTLSDR. It's pretty easy to install and tear down. And it's pretty compact.
+
+![The whole setup](img/setup.jpeg)
 
 ## Sampling via line-in
 
