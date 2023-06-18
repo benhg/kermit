@@ -35,7 +35,8 @@ def main():
         # Those are our deduplicated data points
         summary_points = []
         step = DEDUPLICATION_STEP
-        to_bin = lambda x: np.floor(x / DEDUPLICATION_STEP) * DEDUPLICATION_STEP
+        to_bin = lambda x: np.floor(x / DEDUPLICATION_STEP
+                                    ) * DEDUPLICATION_STEP
         df["lat_bin"] = to_bin(df.latitude)
         df["lon_bin"] = to_bin(df.longitude)
         groups = df.groupby(["lat_bin", "lon_bin"])
@@ -43,13 +44,15 @@ def main():
             lat = group[0][0]
             lon = group[0][1]
             signal_str_db = np.max(group[1].signal_strength_db)
-            summary_points.append({"latitude": lat, "longitude": lon, "signal_strength_db": signal_str_db})
+            summary_points.append({
+                "latitude": lat,
+                "longitude": lon,
+                "signal_strength_db": signal_str_db
+            })
 
         df = pd.DataFrame(summary_points)
-        logging.info(f"Found {len(df['latitude'])} data points after deduplication")
-
-
-        
+        logging.info(
+            f"Found {len(df['latitude'])} data points after deduplication")
 
     fig = px.density_mapbox(
         df,

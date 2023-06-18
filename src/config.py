@@ -111,7 +111,6 @@ because there are too many samples in one place
 Note that this process happens at map generation time and we will not remove data points from the CSV files.
 """
 DEDUPLICATE = True
-
 """
 The step size, in decimal degrees, to use for deduplication binning.
 .001 is about 100 meters
