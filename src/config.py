@@ -33,7 +33,7 @@ It's usually pretty easy to make test transmissions on that frequency
 
 Set it to something that plays nice with your antenna and radio.
 """
-LISTENING_FREQUENCY = 146520000
+LISTENING_FREQUENCY = 145230000
 """
 Because s-unit scales are different for VHF vs HF, we need a config parameter to specify to the program whether the user is listening in VHF or HF
 
@@ -69,6 +69,8 @@ FM simply will not work as FM signal strength is not correlated to audio volume.
 SIGNAL_SOURCE = SignalSource.RTLSDR
 """
 The /dev path that the USB serial device shows up at
+
+Only used if we don't find it ourselves.
 """
 GPS_DEV_PATH = ""
 """
@@ -90,7 +92,7 @@ Only set OUTPUT_FILE_BASE. The OUTPUT_FILE_CSV and OUTPUT_FILE_MAP will be compu
 
 The program will ask you before overwriting, but won't automatically create new filenames.
 """
-OUTPUT_FILE_BASE = "~/Desktop/rf_mapper"
+OUTPUT_FILE_BASE = "~/Desktop/kermit_output/test"
 OUTPUT_FILE_CSV = f"{OUTPUT_FILE_BASE}.csv"
 OUTPUT_FILE_MAP = f"{OUTPUT_FILE_BASE}.html"
 """
@@ -105,6 +107,15 @@ GPS_POLL_SEC = 30
 De-duplicate consecutive entries from the same location
 This is useful for things like getting stuck at a red light, where you end up lighting up the heat maps,
 because there are too many samples in one place
-The downside is that you only keep one sample per place, so you are essentially cutting out some time
+
+Note that this process happens at map generation time and we will not remove data points from the CSV files.
 """
 DEDUPLICATE = True
+
+"""
+The step size, in decimal degrees, to use for deduplication binning.
+.001 is about 100 meters
+.0001 is about 11 meters
+.00001 is about 1.1 meters
+"""
+DEDUPLICATION_STEP = 0.0001
