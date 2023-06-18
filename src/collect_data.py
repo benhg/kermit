@@ -36,7 +36,7 @@ from serial.tools import list_ports
 
 from config import SAMPLE_INTERVAL, SignalSource, SIGNAL_SOURCE, RtlSdrSettings, ANTENNA_FUDGE_FACTOR,\
                    LISTENING_FREQUENCY, ANNOUNCE_SIGNAL, ANNOUNCE_SIGNAL_EVERY, S_UNIT_SCALE, GPS_POLL_SEC,\
-                   OUTPUT_FILE_CSV
+                   OUTPUT_FILE_CSV, DEDUPLICATE
 from utils import get_platform_speak_func, GpsReadQuality, GpsResponse
 """
 If we don't find a GPS, still announce signal but don't store location data
