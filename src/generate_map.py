@@ -19,14 +19,25 @@ import plotly
 from config import OUTPUT_FILE_CSV, OUTPUT_FILE_MAP, AUTO_OPEN_MAP, DEDUPLICATE, DEDUPLICATION_STEP
 
 
-def main():
+def main(args=None):
     """
     Main program entry point
+
+    @param args: arguments from CLI entry point.
+        Only supported argument is the output file
     """
 
+    # Decide if the user has supplied their own output file over CLI
+    output_file_csv = OUTPUT_FILE_CSV
+    output_file_map = OUTPUT_FILE_MAP
+    if args is not None:
+        if args.output_file is not None and args.output_file != "":
+            output_file_map = f"{args.output_file}.html"
+            output_file_csv = f"{args.output_file}.csv"
+
     # Data with latitude/longitude and values
-    csv_file = os.path.expandvars(os.path.expanduser(OUTPUT_FILE_CSV))
-    map_file = os.path.expandvars(os.path.expanduser(OUTPUT_FILE_MAP))
+    csv_file = os.path.expandvars(os.path.expanduser(output_file_csv))
+    map_file = os.path.expandvars(os.path.expanduser(output_file_map))
     df = pd.read_csv(csv_file)
     logging.info(f"Found {len(df['latitude'])} data points")
     if DEDUPLICATE:

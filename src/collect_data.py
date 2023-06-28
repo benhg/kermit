@@ -314,16 +314,26 @@ def init_output_file(expanded_out_file):
         writer.writerow(CSV_COLUMNS)
 
 
-def main():
+def main(args=None):
     """
 	Main program loop.
+
+    @param args: arguments from CLI entry point.
+        Only supported argument is the output file
 	"""
+
+    # Decide if the user has supplied their own output file over CLI
+    output_file_base = OUTPUT_FILE_CSV
+    if args is not None:
+        if args.output_file is not None and args.output_file != "":
+            output_file_base = f"{args.output_file}.csv"
+
     # Detect the platform
     system = platform.system()
     logging.debug(f"Found platform {system}")
     speak_func = get_platform_speak_func(system)
 
-    expanded_out_file = os.path.expandvars(os.path.expanduser(OUTPUT_FILE_CSV))
+    expanded_out_file = os.path.expandvars(os.path.expanduser(output_file_base))
 
     gps_stream = setup_gps_source()
 

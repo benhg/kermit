@@ -19,10 +19,16 @@ def main(args=None):
 
 	@param args: The arguments namespace from the parser
 	"""
-	pass
+	if args.action == "generate-map":
+		map_main(args=args)
+	elif args.action == "collect-data":
+		collect_main(args=args)
 
 if __name__ == '__main__':
+	logging.basicConfig(level=logging.INFO)
 	parser = argparse.ArgumentParser(description=__doc__)
-	parser.add_argument("-o", "--output-file", type=str, required=False, help="Provide an output file (for data collection) or both an input and an output file (for map generation). Provide a filename with no extension as KERMIT will add appropriate extensions.")
+	parser.add_argument("action", metavar='action', type=str,
+                    help="The action for KERMIT to take. Current options: ['generate-map', 'collect-data']", choices=["generate-map", "collect-data"])
+	parser.add_argument("-o", "--output-file", type=str, required=False, help="Provide an output file (for data collection) or both an input and an output file (for map generation). Provide a filename with no extension as KERMIT will add appropriate extensions. This output file overrides the one in the config file.")
 	args = parser.parse_args()
-	main(args)
+	main(args=args)
