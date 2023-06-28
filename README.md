@@ -31,7 +31,7 @@ There are some things you need to do to set up the software. Some requirements c
 4. Install the python dependencies `pip[3] install -r requirements.txt`
 5. Take a look through `config.py` and set anything that needs to be changed for your setup. In particular, you should pay close attention to `LISTENING_FREQUENCY`, `SAMPLE_INTERVAL`, `OUTPUT_FILE`, and `ANTENNA_FUDGE_FACTOR`, 
 
-After those steps, you should be able to just start collecting data. To do that, make sure everything from the hardware setup section is plugged in correctly, and run `python3 collect_data.py`. You should see no logs of `ERROR` or `WARNING` level if both GPS and RF signals are being recieved correctly. Your system's text to speech engine will announce the signal strength every five samples, by default (tunable with `ANNOUNCE_SIGNAL_EVERY` and `ANNOUNCE_SIGNAL` config options). Some sample log output of a healthy operation looks like this:
+After those steps, you should be able to just start collecting data. To do that, make sure everything from the hardware setup section is plugged in correctly, and run `./kermit collect-data`. You should see no logs of `ERROR` or `WARNING` level if both GPS and RF signals are being recieved correctly. Your system's text to speech engine will announce the signal strength every five samples, by default (tunable with `ANNOUNCE_SIGNAL_EVERY` and `ANNOUNCE_SIGNAL` config options). Some sample log output of a healthy operation looks like this:
 
 ```
 INFO:root:Read GGA signal GpsResponse<<obscured>, lng=<obscured>, quality=GPS_SPS, sat_count=7, altitude=30.9, error=1.31, timestamp=022745.00> successfully
@@ -46,7 +46,7 @@ INFO:root:Read GGA signal GpsResponse<lat=<obscured>, lng=<obscured>, quality=GP
 ```
 When you are done sampling, do a ctrl-C. You should see output get appended to the file you specified with OUTPUT_FILE as the collection happens.
 
-To generate a map after doing some sampling, make sure the OUTPUT_FILE set in the `config.py` maps to a correctly populated output CSV created by the sampling process, and run `python3 generate_map.py`. The output map will be generated with the same filename as the CSV output file, but there will be a `.html` extension instead of a `.csv` one.
+To generate a map after doing some sampling, make sure the OUTPUT_FILE set in the `config.py` maps to a correctly populated output CSV created by the sampling process, and run `./kermit generate-map`. The output map will be generated with the same filename as the CSV output file, but there will be a `.html` extension instead of a `.csv` one.
 
 The generated map is an interactive HTML file generated with Plotly and OpenStreetMap. You can choose via `config.py` to open it in the browser (Python will automatically open your browser), save it to an output `.html` file, or both.
 
@@ -79,6 +79,26 @@ The GPS sitting on my dashboard. I've had no problems with GPS reception there.
 The whole setup in my passenger seat. The RTLSDR is connected to the feed line of my antenna on the roof. The inverter powers the laptop, which powers the GPS and the RTLSDR. It's pretty easy to install and tear down. And it's pretty compact.
 
 ![The whole setup](img/setup.jpeg)
+
+## Command-line arguments
+
+KERMIT is distributed as a group of python files. Both `generate_map.py` and `collect_data.py` can safely run directly from the command line (ie `python3 generate_map.py`). However, this requires looking at the actual source code of the project and therefore is not necessarily desirable. For this reason, we have included a CLI tool `kermit` in the top-level directory of this project to make life a bit easier. You can just call `./kermit` with an action and optional output file override this way. Please note that if you set the output file through the command line argument, it will override the output file provided in the config.py. Please see the full help menu below:
+
+```
+ben@benbox:20:02:42[/Users/ben/Desktop/kermit]$ ./kermit -h
+usage: kermit [-h] [-o OUTPUT_FILE] action
+
+This is the entry point to KERMIT. It can be used to collect data and generate maps. For more details about KERMIT, please see https://github.com/benhg/kermit#readme
+
+positional arguments:
+  action                The action for KERMIT to take. Current options: ['generate-map', 'collect-data']
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -o OUTPUT_FILE, --output-file OUTPUT_FILE
+                        Provide an output file (for data collection) or both an input and an output file (for map generation). Provide a filename with no extension as KERMIT will add appropriate
+                        extensions. This output file overrides the one in the config file.
+```
 
 ## Sampling via line-in
 
