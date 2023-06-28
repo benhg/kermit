@@ -1,7 +1,9 @@
-"""
-@file kermit.py
+#!/usr/bin/env python3
 
-@brief This is the entry point to KERMIT
+"""
+This is the entry point to KERMIT. It can be used to collect data and generate maps.
+
+For more details about KERMIT, please see https://github.com/benhg/kermit#readme
 """
 
 import argparse
@@ -11,11 +13,16 @@ from generate_map import main as map_main
 from collect_data import main as collect_main
 
 
-def main():
+def main(args=None):
 	"""
 	The main entry point
+
+	@param args: The arguments namespace from the parser
 	"""
 	pass
 
 if __name__ == '__main__':
-	main()
+	parser = argparse.ArgumentParser(description=__doc__)
+	parser.add_argument("-o", "--output-file", type=str, required=False, help="Provide an output file (for data collection) or both an input and an output file (for map generation). Provide a filename with no extension as KERMIT will add appropriate extensions.")
+	args = parser.parse_args()
+	main(args)

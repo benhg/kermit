@@ -91,6 +91,8 @@ The output file path.
 Only set OUTPUT_FILE_BASE. The OUTPUT_FILE_CSV and OUTPUT_FILE_MAP will be computed.
 
 The program will ask you before overwriting, but won't automatically create new filenames.
+
+If you provide an output file via the `--output-file` option, it will override this
 """
 OUTPUT_FILE_BASE = "~/Desktop/kermit_output/test"
 OUTPUT_FILE_CSV = f"{OUTPUT_FILE_BASE}.csv"
