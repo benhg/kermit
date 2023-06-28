@@ -333,7 +333,8 @@ def main(args=None):
     logging.debug(f"Found platform {system}")
     speak_func = get_platform_speak_func(system)
 
-    expanded_out_file = os.path.expandvars(os.path.expanduser(output_file_base))
+    expanded_out_file = os.path.expandvars(
+        os.path.expanduser(output_file_base))
 
     gps_stream = setup_gps_source()
 
