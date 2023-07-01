@@ -1,0 +1,9 @@
+LICENSE
+README.md
+setup.py
+src/kermit_sdr.egg-info/PKG-INFO
+src/kermit_sdr.egg-info/SOURCES.txt
+src/kermit_sdr.egg-info/dependency_links.txt
+src/kermit_sdr.egg-info/entry_points.txt
+src/kermit_sdr.egg-info/requires.txt
+src/kermit_sdr.egg-info/top_level.txt
