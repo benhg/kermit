@@ -1,3 +1,0 @@
-[console_scripts]
-kermit = kermit_sdr.kermit:main
-
