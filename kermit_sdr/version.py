@@ -4,4 +4,4 @@
 @brief this file contians the version string for KERMIT
 """
 
-VERSION = "0.1.0"
+VERSION = "0.1.1"
