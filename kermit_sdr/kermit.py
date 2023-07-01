@@ -9,9 +9,9 @@ import argparse
 import logging
 import sys
 
-from generate_map import main as map_main
-from collect_data import main as collect_main
-from version import VERSION
+from kermit_sdr.generate_map import main as map_main
+from kermit_sdr.collect_data import main as collect_main
+from kermit_sdr.version import VERSION
 
 
 def main():
