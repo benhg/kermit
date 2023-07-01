@@ -7,24 +7,19 @@ For more details about KERMIT, please see https://github.com/benhg/kermit#readme
 
 import argparse
 import logging
+import sys
 
 from generate_map import main as map_main
 from collect_data import main as collect_main
+from version import VERSION
 
 
-def main(args=None):
+def main():
     """
     The main entry point
 
     @param args: The arguments namespace from the parser
     """
-    if args.action == "generate-map":
-        map_main(args=args)
-    elif args.action == "collect-data":
-        collect_main(args=args)
-
-
-if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -32,8 +27,8 @@ if __name__ == '__main__':
         metavar='action',
         type=str,
         help=
-        "The action for KERMIT to take. Current options: ['generate-map', 'collect-data']",
-        choices=["generate-map", "collect-data"])
+        "The action for KERMIT to take. Current options: ['generate-map', 'collect-data', 'version'']",
+        choices=["generate-map", "collect-data", "version"])
     parser.add_argument(
         "-o",
         "--output-file",
@@ -43,4 +38,14 @@ if __name__ == '__main__':
         "Provide an output file (for data collection) or both an input and an output file (for map generation). Provide a filename with no extension as KERMIT will add appropriate extensions. This output file overrides the one in the config file."
     )
     args = parser.parse_args()
-    main(args=args)
+
+    if args.action == 'version':
+        print(f"KERMIT version {VERSION}")
+    elif args.action == "generate-map":
+        map_main(args=args)
+    elif args.action == "collect-data":
+        collect_main(args=args)
+
+
+if __name__ == '__main__':
+    main()
