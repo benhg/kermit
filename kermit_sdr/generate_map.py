@@ -16,7 +16,7 @@ import numpy as np
 import plotly.express as px
 import plotly
 
-from config import OUTPUT_FILE_CSV, OUTPUT_FILE_MAP, AUTO_OPEN_MAP, DEDUPLICATE, DEDUPLICATION_STEP
+from kermit_sdr.config import OUTPUT_FILE_CSV, OUTPUT_FILE_MAP, AUTO_OPEN_MAP, DEDUPLICATE, DEDUPLICATION_STEP
 
 
 def main(args=None):

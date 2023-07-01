@@ -6,7 +6,7 @@
 """
 
 from enum import Enum, auto
-from utils import S_UNIT_SCALE_HF, S_UNIT_SCALE_VHF
+from kermit_sdr.utils import S_UNIT_SCALE_HF, S_UNIT_SCALE_VHF
 
 
 class SignalSource(Enum):

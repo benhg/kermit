@@ -24,14 +24,17 @@ Please feel free to open an issue or leave a comment with suggestions, requests,
 
 There are some things you need to do to set up the software. Some requirements can not be specified in the `requirements.txt`, as that only works for Python libraries. 
 
-0. Make your copy of the source code. `git clone git@github.com:benhg/kermit.git` and `cd kermit`
+0. (optional if you are using Pip. Required if you are installing from source) Make your copy of the source code. `git clone git@github.com:benhg/kermit.git` and `cd kermit`
 1. Install python. This was tested on Python 3.9, but any version newer than Python 3.6 should work.
 2. (optional) set up a virtual environment `virtualenv rf-mapper` and `source rf-mapper/bin/activate`
 3. Install LibRTLSdr (system .so libraries). `brew install librtlsdr` on mac, or `[apt | yum] install librtlsdr`
 4. Install the python dependencies `pip[3] install -r requirements.txt`
 5. Take a look through `config.py` and set anything that needs to be changed for your setup. In particular, you should pay close attention to `LISTENING_FREQUENCY`, `SAMPLE_INTERVAL`, `OUTPUT_FILE`, and `ANTENNA_FUDGE_FACTOR`, 
+6. Install KERMIT
+    a. Install from PyPI: `pip3 install kermit_sdr`
+    b. Install from source `python3 setup.py install`
 
-After those steps, you should be able to just start collecting data. To do that, make sure everything from the hardware setup section is plugged in correctly, and run `./kermit collect-data`. You should see no logs of `ERROR` or `WARNING` level if both GPS and RF signals are being recieved correctly. Your system's text to speech engine will announce the signal strength every five samples, by default (tunable with `ANNOUNCE_SIGNAL_EVERY` and `ANNOUNCE_SIGNAL` config options). Some sample log output of a healthy operation looks like this:
+After those steps, you should be able to just start collecting data. To do that, make sure everything from the hardware setup section is plugged in correctly, and run `./kermit collect-data`. KERMIT should be installed to your PATH if you installed it using the methods above. You should see no logs of `ERROR` or `WARNING` level if both GPS and RF signals are being recieved correctly. Your system's text to speech engine will announce the signal strength every five samples, by default (tunable with `ANNOUNCE_SIGNAL_EVERY` and `ANNOUNCE_SIGNAL` config options). Some sample log output of a healthy operation looks like this:
 
 ```
 INFO:root:Read GGA signal GpsResponse<<obscured>, lng=<obscured>, quality=GPS_SPS, sat_count=7, altitude=30.9, error=1.31, timestamp=022745.00> successfully
