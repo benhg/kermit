@@ -123,7 +123,7 @@ class GpsResponse:
     """
     A read from a GPS GGA signal. Contains the following attributes:
 
-    Details from here: http://www.gpsinformation.org/dale/nmea.htm#GGA
+    Details from here: http://www.ae.utexas.edu/courses/ase389p7/projects/svatek/commands/GGA.html
 
     @var timestamp - the timestamp associated with the read
     @var lat - latitude
