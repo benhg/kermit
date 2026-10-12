@@ -39,42 +39,29 @@ def main(args=None):
     csv_file = os.path.expandvars(os.path.expanduser(output_file_csv))
     map_file = os.path.expandvars(os.path.expanduser(output_file_map))
     df = pd.read_csv(csv_file)
-    logging.info(f"Found {len(df['latitude'])} data points")
+    df = df.dropna(subset=["latitude", "longitude"])
+    metric = getattr(args, "metric", "auto") if args is not None else "auto"
+    has_field = "field_strength_v_m" in df and df.field_strength_v_m.notna().any()
+    if metric == "v-m" and not has_field:
+        raise ValueError("CSV has no calibrated V/m measurements")
+    value = "field_strength_v_m" if metric == "v-m" or (metric == "auto" and has_field) else (
+        "band_power_dbfs" if "band_power_dbfs" in df else "signal_strength_db")
+    df = df.dropna(subset=[value])
+    if df.empty:
+        raise ValueError("CSV has no located measurements for this metric")
     if DEDUPLICATE:
-        # Bin all the points into groups of 11-meter segments (4 decimal digits)
-        # Take the max signal strength of each bin
-        # Those are our deduplicated data points
-        summary_points = []
-        step = DEDUPLICATION_STEP
-        to_bin = lambda x: np.floor(x / DEDUPLICATION_STEP
-                                    ) * DEDUPLICATION_STEP
-        df["lat_bin"] = to_bin(df.latitude)
-        df["lon_bin"] = to_bin(df.longitude)
-        groups = df.groupby(["lat_bin", "lon_bin"])
-        for group in groups:
-            lat = group[0][0]
-            lon = group[0][1]
-            signal_str_db = np.max(group[1].signal_strength_db)
-            summary_points.append({
-                "latitude": lat,
-                "longitude": lon,
-                "signal_strength_db": signal_str_db
-            })
-
-        df = pd.DataFrame(summary_points)
-        logging.info(
-            f"Found {len(df['latitude'])} data points after deduplication")
-
-    fig = px.density_mapbox(
-        df,
-        lat='latitude',
-        lon='longitude',
-        z='signal_strength_db',
-        radius=8,
-        # Center at the first entry
-        center=dict(lat=df["latitude"][1], lon=df["longitude"][1]),
-        zoom=10,
-        mapbox_style='open-street-map')
+        df["lat_bin"] = np.floor(df.latitude / DEDUPLICATION_STEP) * DEDUPLICATION_STEP
+        df["lon_bin"] = np.floor(df.longitude / DEDUPLICATION_STEP) * DEDUPLICATION_STEP
+        df = df.loc[df.groupby(["lat_bin", "lon_bin"])[value].idxmax()]
+    label = {"field_strength_v_m": "Estimated RMS field (V/m)",
+             "band_power_dbfs": "Band power (dBFS)",
+             "signal_strength_db": "Legacy relative level (dB)"}[value]
+    # Colored points preserve actual values; density maps sum overlapping levels.
+    fig = px.scatter_mapbox(
+        df, lat="latitude", lon="longitude", color=value,
+        labels={value: label}, hover_data=[value],
+        center=dict(lat=float(df.latitude.mean()), lon=float(df.longitude.mean())),
+        zoom=10, mapbox_style="open-street-map", title=label)
 
     logging.info(f"Saving map to {map_file}")
     plotly.offline.plot(fig, filename=map_file, auto_open=AUTO_OPEN_MAP)

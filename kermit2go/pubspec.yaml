@@ -1,0 +1,16 @@
+name: kermit2go
+description: Phone GPS and calibrated SDR RF mapping prototype.
+publish_to: none
+version: 0.1.0+1
+environment:
+  sdk: '>=3.5.0 <4.0.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  geolocator: ^14.0.2
+  http: ^1.5.0
+  path_provider: ^2.1.5
+  share_plus: ^12.0.0
+  cross_file: ^0.3.5
+flutter:
+  uses-material-design: true

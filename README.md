@@ -168,3 +168,68 @@ After connecting everything up, attaching a BNC to SMA coax cable, and testing i
 ![Finished product](img/finished.jpeg)
 
 I also plan to build a step attenuator so that I can narrow down the strengths of signals I identify systematically. I'll add details here when I do that.
+
+## Band power and V/m reporting
+
+New surveys measure mean complex IQ power across the tuned sample bandwidth
+(default 2.048 MHz centered on `LISTENING_FREQUENCY`). This replaces the old
+peak FFT value. `band_power_dbfs` is relative to unit complex IQ magnitude;
+`signal_strength_db` repeats it for CSV compatibility. New and old relative
+levels use different detectors and should not be compared directly.
+
+V/m is an estimated RMS field for this band and antenna orientation. It is not
+an all-frequency or isotropic RF exposure measurement. Receiver noise, DC,
+interference and overload contribute to the measured power. A wide-frequency
+survey needs a calibrated sweep and frequency-dependent antenna factors.
+
+Set these values in `kermit_sdr/config.py`:
+
+- `RECEIVER_DBFS_TO_DBM_OFFSET`: known injected receiver-input dBm minus the
+  measured `band_power_dbfs`. Keep gain fixed; calibrate at the same center
+  frequency, sample rate and direct-sampling setting used for the survey.
+- `ANTENNA_FACTOR_DB_PER_M`: calibrated antenna factor over the sampled band.
+- `CABLE_LOSS_DB`: loss between antenna and calibrated receiver input.
+- `INPUT_IMPEDANCE_OHMS`: calibration impedance (default 50).
+
+The conversion is `P_dBm = P_dBFS + offset`,
+`V_rms = sqrt(R * 10 ** ((P_dBm - 30) / 10))`, and
+`E_V/m = V_rms * 10 ** ((antenna_factor + cable_loss) / 20)`.
+Do not count cable loss twice in receiver calibration. Check several injected
+levels for linearity and saturation. Calibration must cover the measured band;
+a center-frequency calibration alone is an approximation for broadband noise.
+The former `ANTENNA_FUDGE_FACTOR` is not used for absolute measurements.
+
+Without both calibration values, `field_strength_v_m` stays blank and the
+status is `uncalibrated`; KERMIT reports dBFS instead. S-units also require
+receiver calibration. CSV includes center frequency and bandwidth.
+
+`kermit generate-map --metric v-m` requires calibrated readings; `--metric dbfs`
+shows relative band power. The default automatically uses available V/m.
+Maps use colored measurement points, selecting the strongest measurement in
+each location bin. Legacy CSV files remain readable.
+
+## Kermit2Go prototype
+
+The `kermit2go/` directory contains a Flutter mobile prototype using phone GPS,
+a local-network SDR bridge, persistent CSV recording, export and a relative
+survey track. It is foreground-only and pauses when backgrounded. It has not
+been built or tested on a phone yet. Direct Android USB and a geographic map
+inside the app are still to be implemented; exported surveys work with the
+existing desktop map generator.
+
+Android offers a [USB host API](https://developer.android.com/develop/connectivity/usb/host)
+for native SDR access, subject to phone host support, USB permission and power.
+Apple's [USBDriverKit](https://developer.apple.com/documentation/usbdriverkit)
+is available on macOS and M-series iPads, not iPhone. Consequently this initial
+shared implementation uses a bridge host (laptop or small Linux computer) with
+the SDR attached to it. An ordinary RTL-SDR plugged into an iPhone is not
+supported by this prototype.
+
+Run `python -m kermit_sdr.bridge --host 0.0.0.0 --port 8765` on the SDR host.
+Use a trusted private Wi-Fi network. Bridge settings and calibration come from
+`config.py`; do not run desktop collection simultaneously on the same SDR.
+Enter `http://HOST_IP:8765` in the app. The `/measurement` endpoint reads one
+fresh IQ block per request and returns its timestamp, power, field and band.
+The bridge has no authentication or TLS; keep it off public networks.
+
+See `kermit2go/README.md` for native project setup and remaining hardware work.

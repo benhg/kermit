@@ -120,3 +120,12 @@ The step size, in decimal degrees, to use for deduplication binning.
 .00001 is about 1.1 meters
 """
 DEDUPLICATION_STEP = 0.0001
+
+# Absolute calibration for band-integrated RMS measurements. None disables V/m.
+# Offset = known receiver-input dBm minus measured band_power_dbfs, at exactly
+# these gain/sample-rate/direct-sampling settings. Antenna factor must be valid
+# across the sampled band. Changing hardware/settings invalidates calibration.
+RECEIVER_DBFS_TO_DBM_OFFSET = None
+ANTENNA_FACTOR_DB_PER_M = None
+CABLE_LOSS_DB = 0.0
+INPUT_IMPEDANCE_OHMS = 50.0

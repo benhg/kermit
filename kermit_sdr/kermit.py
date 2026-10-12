@@ -10,7 +10,6 @@ import logging
 import sys
 
 from kermit_sdr.generate_map import main as map_main
-from kermit_sdr.collect_data import main as collect_main
 from kermit_sdr.version import VERSION
 
 
@@ -37,6 +36,8 @@ def main():
         help=
         "Provide an output file (for data collection) or both an input and an output file (for map generation). Provide a filename with no extension as KERMIT will add appropriate extensions. This output file overrides the one in the config file."
     )
+    parser.add_argument("--metric", choices=["auto", "v-m", "dbfs"], default="auto",
+                        help="Map values; auto prefers calibrated V/m")
     args = parser.parse_args()
 
     if args.action == 'version':
@@ -44,6 +45,7 @@ def main():
     elif args.action == "generate-map":
         map_main(args=args)
     elif args.action == "collect-data":
+        from kermit_sdr.collect_data import main as collect_main
         collect_main(args=args)
 
 

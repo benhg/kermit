@@ -23,14 +23,12 @@ import platform
 import time
 import atexit
 import numpy as np
-import subprocess
 import logging
 import csv
 import os
 import datetime
 import sys
 
-from rtlsdr import RtlSdr
 import serial
 from serial.tools import list_ports
 
@@ -38,6 +36,8 @@ from kermit_sdr.config import SAMPLE_INTERVAL, SignalSource, SIGNAL_SOURCE, RtlS
                    LISTENING_FREQUENCY, ANNOUNCE_SIGNAL, ANNOUNCE_SIGNAL_EVERY, S_UNIT_SCALE, GPS_POLL_SEC,\
                    OUTPUT_FILE_CSV, DEDUPLICATE
 from kermit_sdr.utils import get_platform_speak_func, GpsReadQuality, GpsResponse
+from kermit_sdr import config
+from kermit_sdr.measurement import measure
 """
 If we don't find a GPS, still announce signal but don't store location data
 """
@@ -47,7 +47,8 @@ The shape of the output CSV file
 """
 CSV_COLUMNS = [
     "timestamp", "signal_strength_db", "signal_strength_s_unit", "latitude",
-    "longitude", "elevation"
+    "longitude", "elevation", "band_power_dbfs", "input_power_dbm",
+    "field_strength_v_m", "measurement_status", "center_frequency_hz", "bandwidth_hz"
 ]
 
 
@@ -109,30 +110,16 @@ def read_signal_str(sdr):
     @param sdr - the RTLSDR object, if we're using the RTLSDR
                  None if we're not
     """
-    if sdr:
-        # this is TOO EASY
-        logging.debug(
-            f"Reading signal samples from RTLSDR at sample rate {RtlSdrSettings.sample_rate}"
-        )
-        samples = sdr.read_samples(1024)
-    else:
-        #collect_samples_from_line_in()
-        pass
+    return read_measurement(sdr)["band_power_dbfs"]
 
-    # Once we have some samples of the signal, we can extract the power
-    freq, dbfs = dbfft(samples, RtlSdrSettings.sample_rate)
-    logging.debug(
-        f"Signal sample summary: min - {np.min(dbfs)}, max: - {np.max(dbfs)}, average - {np.average(dbfs)}"
-    )
-    # TODO - instead of doing the max, we really should specifically take the listening frequency
-    # Or something like the range of the antenna's useful frequencies (requires user config input)
-    # But for almost all practical intents and purposes, the max _is_ the listening frequency
-    max_db = np.max(dbfs)
-    logging.debug(
-        f"Shifting measured signal {max_db} by antenna gain {ANTENNA_FUDGE_FACTOR}"
-    )
-    db_result = max_db - ANTENNA_FUDGE_FACTOR
-    return db_result
+
+def read_measurement(sdr):
+    if sdr is None:
+        raise ValueError("An SDR is required")
+    return measure(sdr.read_samples(16384), float(sdr.center_freq),
+                   float(sdr.sample_rate), config.RECEIVER_DBFS_TO_DBM_OFFSET,
+                   config.ANTENNA_FACTOR_DB_PER_M, config.CABLE_LOSS_DB,
+                   config.INPUT_IMPEDANCE_OHMS)
 
 
 def announce_signal(signal_strength_s_unit, speak_func):
@@ -259,7 +246,7 @@ def setup_gps_source():
 
 
 def save_read_to_file(expanded_out_file, signal_strength_db,
-                      signal_strength_s_unit, gps_read):
+                      signal_strength_s_unit, gps_read, measurement=None):
     """
     Save a single sample to the CSV file. Assumes we've set it up already
     and there is a correctly populated header.
@@ -271,10 +258,6 @@ def save_read_to_file(expanded_out_file, signal_strength_db,
 
     row_dict["timestamp"] = str(datetime.datetime.now())
 
-    [
-        "timestamp", "signal_strength_db", "signal_strength_s_unit",
-        "latitude", "longitude", "elevation"
-    ]
     # Populate GPS reads if the GPS read is a valid object
     if gps_read is not None:
         row_dict["latitude"] = gps_read.lat
@@ -283,6 +266,9 @@ def save_read_to_file(expanded_out_file, signal_strength_db,
 
     row_dict["signal_strength_db"] = signal_strength_db
     row_dict["signal_strength_s_unit"] = signal_strength_s_unit
+
+    if measurement is not None:
+        row_dict.update(measurement)
 
     # Open in append mode
     with open(expanded_out_file, "a") as fh:
@@ -355,6 +341,7 @@ def main(args=None):
     if SIGNAL_SOURCE == SignalSource.RTLSDR:
         # Configure the RTLSDR if we want it
         logging.debug("Using signal source RTLSDR")
+        from rtlsdr import RtlSdr
         sdr = RtlSdr()
         if LISTENING_FREQUENCY <= 3e7:
             # For HF frequencies, we will get better results out of direct sampling
@@ -374,10 +361,13 @@ def main(args=None):
     while True:
 
         # Get and process the signal strength
-        signal_strength_db = read_signal_str(sdr)
-        signal_strength_s_unit = get_s_unit_from_db(signal_strength_db)
+        measurement = read_measurement(sdr)
+        signal_strength_db = measurement["band_power_dbfs"]
+        signal_strength_s_unit = (get_s_unit_from_db(measurement["input_power_dbm"])
+                                  if measurement["input_power_dbm"] is not None else "Uncalibrated")
         logging.info(
-            f"Signal strength {format(signal_strength_db, '.3f')} dB ({signal_strength_s_unit})."
+            f"Band power {signal_strength_db:.3f} dBFS; "
+            f"field {measurement['field_strength_v_m']} V/m ({measurement['measurement_status']})."
         )
 
         gps_read = None
@@ -387,14 +377,16 @@ def main(args=None):
             gps_read = get_gga_signal_from_serial(gps_stream)
 
         save_read_to_file(expanded_out_file, signal_strength_db,
-                          signal_strength_s_unit, gps_read)
+                          signal_strength_s_unit, gps_read, measurement)
 
         time.sleep(SAMPLE_INTERVAL)
         if ANNOUNCE_SIGNAL and (i % ANNOUNCE_SIGNAL_EVERY == 0):
             logging.debug(
                 f"Announcing signal strength {signal_strength_db} dB ({signal_strength_db})"
             )
-            announce_signal(signal_strength_s_unit, speak_func)
+            announce_signal((f"{measurement['field_strength_v_m']:.4g} volts per meter"
+                             if measurement["field_strength_v_m"] is not None
+                             else f"{signal_strength_db:.1f} d B F S"), speak_func)
 
         i += 1
 
