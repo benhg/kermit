@@ -381,6 +381,11 @@ def init_output_file(expanded_out_file):
     if not new_file:
         return False
 
+    # The default output goes to ~/Desktop/kermit_output/, which usually does not exist yet
+    out_dir = os.path.dirname(expanded_out_file)
+    if out_dir:
+        os.makedirs(out_dir, exist_ok=True)
+
     # open in "w" mode to write a new file
     with open(expanded_out_file, "w") as fh:
         writer = csv.writer(fh)
