@@ -246,7 +246,8 @@ an all-frequency or isotropic RF exposure measurement. Receiver noise, DC,
 interference and overload contribute to the measured power. A wide-frequency
 survey needs a calibrated sweep and frequency-dependent antenna factors.
 
-Set these values in `kermit_sdr/config.py`:
+Set these values in `kermit_sdr/config.py`. [CALIBRATION.md](CALIBRATION.md) walks through measuring them step by step, for example with a tinySA as the signal source.
+
 
 - `RECEIVER_DBFS_TO_DBM_OFFSET`: known injected receiver-input dBm minus the
   measured `band_power_dbfs`. Keep gain fixed; calibrate at the same center
