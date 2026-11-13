@@ -26,7 +26,7 @@ def main():
         metavar='action',
         type=str,
         help=
-        "The action for KERMIT to take. Current options: ['generate-map', 'collect-data', 'version'']",
+        "The action for KERMIT to take. Current options: ['generate-map', 'collect-data', 'version']",
         choices=["generate-map", "collect-data", "version"])
     parser.add_argument(
         "-o",
