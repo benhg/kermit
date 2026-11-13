@@ -68,9 +68,24 @@ FM simply will not work as FM signal strength is not correlated to audio volume.
 """
 SIGNAL_SOURCE = SignalSource.RTLSDR
 """
-The /dev path that the USB serial device shows up at
+Where location comes from:
 
-Only used if we don't find it ourselves.
+"auto"   - use gpsd if it is running and has a receiver, otherwise read the
+           serial port directly (default)
+"gpsd"   - only use gpsd. Use this when gpsd already owns the receiver, so that
+           KERMIT and other programs can share it.
+"serial" - only read the serial port directly (NMEA $GPGGA sentences)
+"""
+GPS_SOURCE = "auto"
+"""
+gpsd host and port, used when GPS_SOURCE is "auto" or "gpsd"
+"""
+GPSD_HOST = "127.0.0.1"
+GPSD_PORT = 2947
+"""
+The /dev path that the USB serial GPS shows up at, for the serial source.
+
+Leave empty to search for it. If set and present, it is used without asking.
 """
 GPS_DEV_PATH = ""
 """

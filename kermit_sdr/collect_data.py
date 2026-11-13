@@ -34,10 +34,11 @@ from serial.tools import list_ports
 
 from kermit_sdr.config import SAMPLE_INTERVAL, SignalSource, SIGNAL_SOURCE, RtlSdrSettings, ANTENNA_FUDGE_FACTOR,\
                    LISTENING_FREQUENCY, ANNOUNCE_SIGNAL, ANNOUNCE_SIGNAL_EVERY, S_UNIT_SCALE, GPS_POLL_SEC,\
-                   OUTPUT_FILE_CSV, DEDUPLICATE
+                   OUTPUT_FILE_CSV, DEDUPLICATE, GPS_SOURCE, GPSD_HOST, GPSD_PORT, GPS_DEV_PATH
 from kermit_sdr.utils import get_platform_speak_func, GpsReadQuality, GpsResponse
 from kermit_sdr import config
 from kermit_sdr.measurement import measure
+from kermit_sdr.gps import GpsdSource
 """
 If we don't find a GPS, still announce signal but don't store location data
 """
@@ -190,13 +191,99 @@ def get_gga_signal_from_serial(serial_obj):
     return res
 
 
+class SerialGpsSource:
+    """
+    GPS read directly from a serial port (NMEA GGA sentences)
+    """
+    def __init__(self, serial_obj):
+        self.serial_obj = serial_obj
+
+    def read(self):
+        return get_gga_signal_from_serial(self.serial_obj)
+
+    def close(self):
+        self.serial_obj.close()
+
+
 def setup_gps_source():
+    """
+    Pick the GPS source according to GPS_SOURCE in config.py
+
+    "gpsd"   - only use gpsd
+    "serial" - only read the serial port directly
+    "auto"   - use gpsd if it is running and has a receiver, otherwise serial
+
+    @return an object with read() and close(), or None if there is no GPS
+    """
+    source = str(GPS_SOURCE).lower()
+    if source not in ("auto", "gpsd", "serial"):
+        logging.error(f"Unknown GPS_SOURCE '{GPS_SOURCE}', expected auto, gpsd or serial")
+        return None
+
+    if source in ("auto", "gpsd"):
+        gpsd = setup_gpsd_source(required=(source == "gpsd"))
+        if gpsd is not None or source == "gpsd":
+            return gpsd
+
+    serial_obj = setup_serial_gps_source()
+    return SerialGpsSource(serial_obj) if serial_obj is not None else None
+
+
+def setup_gpsd_source(required=False):
+    """
+    Connect to gpsd at GPSD_HOST:GPSD_PORT
+
+    @param required - True if gpsd was asked for explicitly. In auto mode we
+        quietly fall back to the serial port instead.
+    @return a GpsdSource, or None
+    """
+    log_problem = logging.error if required else logging.info
+    try:
+        gpsd = GpsdSource(GPSD_HOST, GPSD_PORT)
+    except OSError as err:
+        log_problem(f"Could not connect to gpsd at {GPSD_HOST}:{GPSD_PORT} ({err})")
+        return None
+
+    # gpsd sends its device list right after WATCH. Without a receiver it is no use.
+    for _ in range(20):
+        if gpsd.devices is not None:
+            break
+        time.sleep(0.1)
+    if not gpsd.devices:
+        log_problem(f"gpsd at {GPSD_HOST}:{GPSD_PORT} has no GPS receiver attached")
+        gpsd.close()
+        return None
+
+    logging.info(f"Using gpsd at {GPSD_HOST}:{GPSD_PORT} ({', '.join(gpsd.devices)})")
+    for _ in range(GPS_POLL_SEC):
+        res = gpsd.read()
+        if res is not None and res.is_valid_read():
+            logging.info("gpsd has a valid fix")
+            return gpsd
+        time.sleep(1)
+
+    # Unlike the serial port, gpsd costs nothing to keep. Locations get
+    # recorded as soon as a fix shows up.
+    logging.warning(
+        f"No valid fix from gpsd after {GPS_POLL_SEC} seconds. "
+        "Recording without location until there is one")
+    return gpsd
+
+
+def setup_serial_gps_source():
     """
     Find a GPS source over serial and return something that we can read from
 
     @return a Serial object that can be read for GPS data
     """
-    port_list = list(list_ports.comports())
+    if GPS_DEV_PATH:
+        logging.info(f"Using GPS serial device {GPS_DEV_PATH} from config")
+        port_list = [p for p in list_ports.comports() if p.device == GPS_DEV_PATH]
+        if not port_list:
+            logging.warning(f"GPS_DEV_PATH {GPS_DEV_PATH} not found, searching for a GPS")
+            port_list = list(list_ports.comports())
+    else:
+        port_list = list(list_ports.comports())
     logging.debug(
         f"Candidate GPS devices: [{', '.join([p.device for p in port_list])}]")
 
@@ -327,6 +414,8 @@ def main(args=None):
     if gps_stream == None:
         logging.warning("GPS source not found. Not storing location data")
         store_location = False
+    else:
+        atexit.register(gps_stream.close)
 
     # Leave this obj as None if we are not using the RTLSDR
     sdr = None
@@ -374,7 +463,7 @@ def main(args=None):
 
         # Get and process the location
         if gps_stream is not None:
-            gps_read = get_gga_signal_from_serial(gps_stream)
+            gps_read = gps_stream.read()
 
         save_read_to_file(expanded_out_file, signal_strength_db,
                           signal_strength_s_unit, gps_read, measurement)
