@@ -35,6 +35,7 @@ You need a signal of known level at the SDR input. Any of these work:
 
 - a signal generator, for example the one in a tinySA (see below)
 - a transmitter of known power followed by enough attenuation (see the warning below)
+- an S-meter calibrator, with some limits (see below)
 
 ### Using a tinySA
 
@@ -92,12 +93,25 @@ You can use an HT of known power with an attenuator chain, for example 0.5 W (+2
 
 **Never connect a transmitter to an SDR without enough attenuation. It will destroy the SDR.** Check the attenuators' power rating for the first stage. Also keep in mind that cheap attenuators leak, and an HT's real output power can be quite different from what it says. Your offset can't be better than these numbers. If you have a tinySA, use it to check the power and the attenuation.
 
-### An S9 calibrator
+### An S-meter calibrator (example: WB2JLR S9 Signal Generator)
 
-A fixed S9 calibrator (S9 is -73 dBm on HF and -93 dBm on VHF and up) only gives you one level, so it can't show whether the receiver is linear. It is still useful to check your main signal source at one point. Two limits:
+S-meter calibrators are made for HF, where S9 is -73 dBm. (On VHF and up, S9 is defined as -93 dBm.) Check what yours puts out before using it. The WB2JLR S9 Signal Generator is a good example of what to look for:
 
-- An HF calibrator only calibrates HF settings. Below 30 MHz KERMIT uses direct sampling, which needs its own offset.
-- -93 dBm is usually too weak here, because KERMIT measures the noise of the whole 2 MHz band along with it. Check that the "on" reading is at least 10 dB above "off".
+- Three levels, selected with a jumper: -103 dBm (S4), -73 dBm (S9) and -43 dBm (S9+30)
+- A comb of signals at every multiple of 1.78977 MHz, all at the same time
+- Level accurate within 1 dB from 1.8 to 30 MHz. Above 30 MHz (up to 1 GHz) the signals are there, but their level is not calibrated.
+
+**For an HF survey** (`LISTENING_FREQUENCY` below 30 MHz, so KERMIT uses direct sampling) it works as a calibrated source:
+
+- Use the -43 dBm and -73 dBm settings, and check that "on" is at least 10 dB above "off". -103 dBm will almost always disappear in the noise of the 2 MHz band. The two usable levels are 30 dB apart, which also gives you a linearity check.
+- Because the comb lines are only 1.79 MHz apart, a 2.048 MHz wide band can contain two of them, which adds 3 dB. Pick `LISTENING_FREQUENCY` so that only one line falls into the band, a few hundred kHz away from the center. For example, 14.0 MHz puts the band at 12.976 to 15.024 MHz, with only the 14.318 MHz line in it.
+
+**For the default 2 m setup** (145.23 MHz) the band runs from 144.206 to 146.254 MHz and contains exactly one comb line, 144.97 MHz, 260 kHz below the center. That is a good spot, but the level up there is not calibrated. Two ways to still use it:
+
+- Measure the 144.97 MHz line with the tinySA's spectrum analyzer at each jumper setting, and then use the calibrator as a source with those measured levels. It is battery powered and very stable, which makes it a handy way to repeat the calibration later.
+- Even without knowing the absolute level, the change between jumper settings shows whether the receiver responds linearly. Treat the 30 dB steps as approximate at 145 MHz, since they are only specified for HF.
+
+Don't connect it to a radio that could transmit into it.
 
 ## Part 2: Antenna factor and cable loss
 
