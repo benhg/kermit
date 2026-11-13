@@ -66,6 +66,15 @@ To generate a map after doing some sampling, make sure the OUTPUT_FILE set in th
 
 The generated map is an interactive HTML file generated with Plotly and OpenStreetMap. You can choose via `config.py` to open it in the browser (Python will automatically open your browser), save it to an output `.html` file, or both.
 
+With Plotly 6 and newer, the map is drawn with MapLibre. Browsers do not let MapLibre start its background worker when the `.html` file is opened directly from disk (a `file://` address), so you get the street map but none of the measurement points. Serve the file from a local web server instead, for example with the one that comes with Python:
+
+```sh
+cd ~/Desktop/kermit_output          # the directory with your .html map
+python3 -m http.server 8000 --bind 127.0.0.1
+```
+
+Then open http://127.0.0.1:8000/test.html (use the name of your map file) and stop the server with ctrl-C when you are done. This also applies to the map that opens automatically with `AUTO_OPEN_MAP`, so you may want to set that to `False`.
+
 ### GPS: serial port or gpsd
 
 KERMIT can read the GPS in two ways: directly from its serial port (NMEA `$GPGGA` sentences), or through [gpsd](https://gpsd.io/). gpsd is the better choice when it is already running, because it keeps the receiver open and KERMIT would otherwise be fighting it for the serial port. It also lets other programs use the GPS at the same time.
