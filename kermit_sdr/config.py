@@ -114,8 +114,16 @@ OUTPUT_FILE_CSV = f"{OUTPUT_FILE_BASE}.csv"
 OUTPUT_FILE_MAP = f"{OUTPUT_FILE_BASE}.html"
 """
 Should we auto-open the map in your browser?
+
+The map is opened through a small web server on 127.0.0.1 (see map_server.py),
+because the map's points do not show up when the .html file is opened from disk.
+generate-map then keeps running until you press ctrl-C.
 """
 AUTO_OPEN_MAP = True
+"""
+Port for the map web server. If it is in use, a free port is picked instead.
+"""
+MAP_SERVER_PORT = 8000
 """
 How long in seconds should we wait before giving up on using GPS?
 """

@@ -26,8 +26,8 @@ def main():
         metavar='action',
         type=str,
         help=
-        "The action for KERMIT to take. Current options: ['generate-map', 'collect-data', 'version']",
-        choices=["generate-map", "collect-data", "version"])
+        "The action for KERMIT to take. Current options: ['generate-map', 'view-map', 'collect-data', 'version']",
+        choices=["generate-map", "view-map", "collect-data", "version"])
     parser.add_argument(
         "-o",
         "--output-file",
@@ -44,6 +44,9 @@ def main():
         print(f"KERMIT version {VERSION}")
     elif args.action == "generate-map":
         map_main(args=args)
+    elif args.action == "view-map":
+        from kermit_sdr.generate_map import view_map
+        view_map(args=args)
     elif args.action == "collect-data":
         from kermit_sdr.collect_data import main as collect_main
         collect_main(args=args)
