@@ -57,11 +57,17 @@ def main(args=None):
              "band_power_dbfs": "Band power (dBFS)",
              "signal_strength_db": "Legacy relative level (dB)"}[value]
     # Colored points preserve actual values; density maps sum overlapping levels.
-    fig = px.scatter_mapbox(
-        df, lat="latitude", lon="longitude", color=value,
+    # Plotly 5.24 added the MapLibre-based scatter_map; scatter_mapbox was
+    # deprecated in 6.x and is gone in 7.x. Keep the old call for old Plotly.
+    map_args = dict(
+        lat="latitude", lon="longitude", color=value,
         labels={value: label}, hover_data=[value],
         center=dict(lat=float(df.latitude.mean()), lon=float(df.longitude.mean())),
-        zoom=10, mapbox_style="open-street-map", title=label)
+        zoom=10, title=label)
+    if hasattr(px, "scatter_map"):
+        fig = px.scatter_map(df, map_style="open-street-map", **map_args)
+    else:
+        fig = px.scatter_mapbox(df, mapbox_style="open-street-map", **map_args)
 
     logging.info(f"Saving map to {map_file}")
     plotly.offline.plot(fig, filename=map_file, auto_open=AUTO_OPEN_MAP)
