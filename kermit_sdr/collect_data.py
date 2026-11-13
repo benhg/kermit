@@ -39,6 +39,9 @@ from kermit_sdr.utils import get_platform_speak_func, GpsReadQuality, GpsRespons
 from kermit_sdr import config
 from kermit_sdr.measurement import measure
 from kermit_sdr.gps import GpsdSource
+
+# How long to wait for gpsd's device list after connecting
+GPSD_DEVICE_WAIT_SEC = 10
 """
 If we don't find a GPS, still announce signal but don't store location data
 """
@@ -244,11 +247,18 @@ def setup_gpsd_source(required=False):
         log_problem(f"Could not connect to gpsd at {GPSD_HOST}:{GPSD_PORT} ({err})")
         return None
 
-    # gpsd sends its device list right after WATCH. Without a receiver it is no use.
-    for _ in range(20):
+    # gpsd sends its device list in reply to WATCH. If no client was connected,
+    # gpsd has closed the receiver and reopens it first, which takes a couple
+    # of seconds, so be patient.
+    for _ in range(GPSD_DEVICE_WAIT_SEC * 10):
         if gpsd.devices is not None:
             break
         time.sleep(0.1)
+    if gpsd.devices is None:
+        log_problem(f"gpsd at {GPSD_HOST}:{GPSD_PORT} did not report its devices "
+                    f"within {GPSD_DEVICE_WAIT_SEC} seconds")
+        gpsd.close()
+        return None
     if not gpsd.devices:
         log_problem(f"gpsd at {GPSD_HOST}:{GPSD_PORT} has no GPS receiver attached")
         gpsd.close()
@@ -314,7 +324,13 @@ def setup_serial_gps_source():
         logging.warning("Could not find GPS. Not logging location source")
         return None
     logging.debug(f"Found GPS source device {port}")
-    serial_obj = serial.Serial(port)
+    try:
+        serial_obj = serial.Serial(port)
+    except serial.SerialException as err:
+        logging.error(
+            f"Could not open GPS port {port}: {err}. If gpsd is running, it probably "
+            "has the port open. Set GPS_SOURCE = \"gpsd\" in config.py, or stop gpsd")
+        return None
     # Wait for it to start returning location data
     for _ in range(GPS_POLL_SEC):
         gps_response = get_gga_signal_from_serial(serial_obj)
