@@ -68,9 +68,24 @@ FM simply will not work as FM signal strength is not correlated to audio volume.
 """
 SIGNAL_SOURCE = SignalSource.RTLSDR
 """
-The /dev path that the USB serial device shows up at
+Where location comes from:
 
-Only used if we don't find it ourselves.
+"auto"   - use gpsd if it is running and has a receiver, otherwise read the
+           serial port directly (default)
+"gpsd"   - only use gpsd. Use this when gpsd already owns the receiver, so that
+           KERMIT and other programs can share it.
+"serial" - only read the serial port directly (NMEA $GPGGA sentences)
+"""
+GPS_SOURCE = "auto"
+"""
+gpsd host and port, used when GPS_SOURCE is "auto" or "gpsd"
+"""
+GPSD_HOST = "127.0.0.1"
+GPSD_PORT = 2947
+"""
+The /dev path that the USB serial GPS shows up at, for the serial source.
+
+Leave empty to search for it. If set and present, it is used without asking.
 """
 GPS_DEV_PATH = ""
 """
@@ -99,8 +114,16 @@ OUTPUT_FILE_CSV = f"{OUTPUT_FILE_BASE}.csv"
 OUTPUT_FILE_MAP = f"{OUTPUT_FILE_BASE}.html"
 """
 Should we auto-open the map in your browser?
+
+The map is opened through a small web server on 127.0.0.1 (see map_server.py),
+because the map's points do not show up when the .html file is opened from disk.
+generate-map then keeps running until you press ctrl-C.
 """
 AUTO_OPEN_MAP = True
+"""
+Port for the map web server. If it is in use, a free port is picked instead.
+"""
+MAP_SERVER_PORT = 8000
 """
 How long in seconds should we wait before giving up on using GPS?
 """

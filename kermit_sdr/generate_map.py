@@ -9,6 +9,7 @@ Heavy inspiration taken from https://python-charts.com/spatial/spatial-heatmap-p
 """
 
 import os
+import sys
 import logging
 
 import pandas as pd
@@ -16,7 +17,9 @@ import numpy as np
 import plotly.express as px
 import plotly
 
-from kermit_sdr.config import OUTPUT_FILE_CSV, OUTPUT_FILE_MAP, AUTO_OPEN_MAP, DEDUPLICATE, DEDUPLICATION_STEP
+from kermit_sdr.config import OUTPUT_FILE_CSV, OUTPUT_FILE_MAP, AUTO_OPEN_MAP, DEDUPLICATE, DEDUPLICATION_STEP, \
+    MAP_SERVER_PORT
+from kermit_sdr.map_server import serve_map
 
 
 def main(args=None):
@@ -57,14 +60,38 @@ def main(args=None):
              "band_power_dbfs": "Band power (dBFS)",
              "signal_strength_db": "Legacy relative level (dB)"}[value]
     # Colored points preserve actual values; density maps sum overlapping levels.
-    fig = px.scatter_mapbox(
-        df, lat="latitude", lon="longitude", color=value,
+    # Plotly 5.24 added the MapLibre-based scatter_map; scatter_mapbox was
+    # deprecated in 6.x and is gone in 7.x. Keep the old call for old Plotly.
+    map_args = dict(
+        lat="latitude", lon="longitude", color=value,
         labels={value: label}, hover_data=[value],
         center=dict(lat=float(df.latitude.mean()), lon=float(df.longitude.mean())),
-        zoom=10, mapbox_style="open-street-map", title=label)
+        zoom=10, title=label)
+    if hasattr(px, "scatter_map"):
+        fig = px.scatter_map(df, map_style="open-street-map", **map_args)
+    else:
+        fig = px.scatter_mapbox(df, mapbox_style="open-street-map", **map_args)
 
     logging.info(f"Saving map to {map_file}")
-    plotly.offline.plot(fig, filename=map_file, auto_open=AUTO_OPEN_MAP)
+    plotly.offline.plot(fig, filename=map_file, auto_open=False)
+    if AUTO_OPEN_MAP:
+        serve_map(map_file, port=MAP_SERVER_PORT)
+    else:
+        logging.info("Run 'kermit view-map' (with the same -o, if you used one) to look at it")
+
+
+def view_map(args=None):
+    """
+    Serve an existing map without generating it again
+    """
+    output_file_map = OUTPUT_FILE_MAP
+    if args is not None and args.output_file:
+        output_file_map = f"{args.output_file}.html"
+    map_file = os.path.expandvars(os.path.expanduser(output_file_map))
+    if not os.path.isfile(map_file):
+        logging.error(f"Map file {map_file} does not exist. Run 'kermit generate-map' first")
+        sys.exit(1)
+    serve_map(map_file, port=MAP_SERVER_PORT)
 
 
 if __name__ == '__main__':
