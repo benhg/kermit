@@ -112,7 +112,13 @@ sudo apt install rtl-sdr
 echo 'blacklist dvb_usb_rtl28xxu' | sudo tee /etc/modprobe.d/blacklist-rtlsdr.conf
 ```
 
-Then unplug the dongle and plug it back in. `rtl_test` (from the same package) is a quick way to check that the dongle can be opened. Stop it with ctrl-C.
+The blacklist only keeps the driver from being loaded. If the dongle was plugged in before, the driver is probably loaded already, and it attaches to the dongle again when you replug it. Either reboot, or unplug the dongle, unload the driver and plug the dongle back in:
+
+```sh
+sudo modprobe -r dvb_usb_rtl28xxu
+```
+
+`lsmod | grep rtl28` should then show nothing after plugging the dongle back in. `rtl_test` (from the `rtl-sdr` package) is a quick way to check that the dongle can be opened. Stop it with ctrl-C. Note that `rtl_test` can work even while the TV driver is loaded, because the system library detaches it; the library KERMIT uses does not.
 
 ## Hardware setup
 
