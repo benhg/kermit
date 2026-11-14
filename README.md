@@ -29,7 +29,7 @@ There are some things you need to do to set up the software. Some requirements c
 0. (optional if you are using Pip. Required if you are installing from source) Make your copy of the source code. `git clone git@github.com:benhg/kermit.git` and `cd kermit`
 1. Install python. This was tested on Python 3.9, 3.12 and 3.13, but any version newer than Python 3.6 should work.
 2. (optional) set up a virtual environment `virtualenv rf-mapper` and `source rf-mapper/bin/activate`
-3. (optional) Install LibRTLSdr (system .so libraries). `brew install librtlsdr` on mac, or `[apt | yum] install librtlsdr`. The `pyrtlsdrlib` package in `requirements.txt` brings its own copy of the library, and pyrtlsdr uses that one first, so this step is usually not needed. On Apple Silicon Macs the Homebrew library does not work at all: it lives in `/opt/homebrew/lib`, where pyrtlsdr does not look, and it is missing `rtlsdr_set_dithering`, which current pyrtlsdr versions need.
+3. Install LibRTLSdr (system .so libraries). `brew install librtlsdr` on mac (optional), or `apt install rtl-sdr` on Debian, Ubuntu and Mint. The `pyrtlsdrlib` package in `requirements.txt` brings its own copy of the library, and pyrtlsdr uses that one first, so on a Mac this step is usually not needed. On Linux you still want the distribution package, because it also installs the udev rule that lets normal users open the dongle (see "Linux: permissions and the TV driver" below). On Apple Silicon Macs the Homebrew library does not work at all: it lives in `/opt/homebrew/lib`, where pyrtlsdr does not look, and it is missing `rtlsdr_set_dithering`, which current pyrtlsdr versions need.
 4. Install the python dependencies `pip[3] install -r requirements.txt`
 5. Take a look through `config.py` and set anything that needs to be changed for your setup. In particular, you should pay close attention to `LISTENING_FREQUENCY`, `SAMPLE_INTERVAL`, `OUTPUT_FILE_BASE` and `GPS_SOURCE`. For calibrated V/m readings, see "Band power and V/m reporting" below.
 6. Install KERMIT
@@ -100,13 +100,19 @@ For the serial port, set `GPS_DEV_PATH` (for example `/dev/ttyACM0`) if you don'
 
 A GPS indoors often won't get a fix at all, or only a weak one. If the log says it could not get a valid signal from the GPS, try again near a window or outside.
 
-### Linux: freeing the RTL-SDR from the TV driver
+### Linux: permissions and the TV driver
 
-On most Linux distributions the kernel's DVB-T TV driver grabs the RTL-SDR as soon as it is plugged in, and KERMIT fails with `LIBUSB_ERROR_BUSY ... Could not open SDR`. Blacklist the driver and then unplug and replug the dongle:
+Two things usually stop KERMIT from opening the RTL-SDR on Linux:
+
+- `LIBUSB_ERROR_ACCESS ... Access denied`: Normal users are not allowed to open the dongle. The distribution package (`apt install rtl-sdr` on Debian, Ubuntu and Mint) installs a udev rule that gives the `plugdev` group access. Your user needs to be in that group, which it usually is on desktop installs (check with `groups`).
+- `LIBUSB_ERROR_BUSY`: The kernel's DVB-T TV driver grabbed the dongle as soon as it was plugged in. Blacklist it.
 
 ```sh
+sudo apt install rtl-sdr
 echo 'blacklist dvb_usb_rtl28xxu' | sudo tee /etc/modprobe.d/blacklist-rtlsdr.conf
 ```
+
+Then unplug the dongle and plug it back in. `rtl_test` (from the same package) is a quick way to check that the dongle can be opened. Stop it with ctrl-C.
 
 ## Hardware setup
 
